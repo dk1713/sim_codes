@@ -21,25 +21,36 @@ h_clad  = 15e-6;
 h_core  = 5e-6;
 
 lam     = 780e-9;
-n       = 1;
-k0      = 2*pi*n_air/lambda;
+k0      = 2*pi*n_air/lam;
 %% Target specification
 % distance from the top of the chip.
-dist    = 50e-6;
+pos_tar     = [20e-6, 10e-6, 50e-6];
 % estimated waist at the surface
-waist   = 5e-6;
-%% On the Surface
-% 3D Gaussian on the Surface
-% init:
-psi     = 30*pi/180;
+waist_tar   = [5e-6, 10e-6];
+%% 3D Gaussian on the Surface
+% 1. defining the domain
+L_x     = 200e-6;
+L_y     = 200e-6;
 
-L_x         = 2*w_x;
-L_y         = 2*w_y;
+N_x     = 2^12; 
+N_y     = N_x/(2^7);
 
-Nx          = 2^10; 
-Ny          = Nx/2;
-dx          = L_x / Nx;
-dy          = L_y / Ny;
+x       = linspace(-.5*L_x, .5*L_x, N_x);
+y       = linspace(-.5*L_y, .5*L_y, N_y);
 
-EE      = zeros(Ny,Nx);
-kk_z    = zeros(Ny,Nx);
+% 2. defining the arbitrary beam
+n       = 1;
+[xx, yy]    = meshgrid(x, y);
+EE_1        = exp( -(...
+    (.5*(xx - pos_tar(1))./waist_tar(1)).^2     ...
+    + (.5*(yy - pos_tar(2))./waist_tar(2)).^2   ...
+    ).^n );
+
+figure(1)
+pcolor(xx, yy, abs(EE_1).^2)
+shading flat
+xlabel('x')
+ylabel('y')
+title('Intensity on surface')
+colorbar
+axis equal
