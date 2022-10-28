@@ -24,7 +24,7 @@ lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
 %% Target specification
 % distance from the top of the chip.
-pos_tar     = [50e-6, 50e-6, 100e-6];
+pos_tar     = [10e-6, 10e-6, 10e-6];
 % estimated waist at the surface
 waist_tar   = [10e-6, 15e-6];
 %% Init
@@ -33,7 +33,7 @@ L_x     = 200e-6;
 L_y     = 200e-6;
 
 N_x     = 2^10; 
-N_y     = N_x/2^4;
+N_y     = N_x;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -41,13 +41,13 @@ y       = linspace(-.5*L_y, .5*L_y, N_y);
 % 2. defining the arbitrary beam
 n       = 1;
 [xx, yy]    = meshgrid(x, y);
-psi_x       = atan2(pos_tar(3),pos_tar(1));
-psi_y       = atan2(pos_tar(3),pos_tar(2));
+k_cen_x     = k0*pos_tar(1)/sqrt(pos_tar(1)^2 + pos_tar(2)^2 + pos_tar(3)^2);
+k_cen_y     = k0*pos_tar(2)/sqrt(pos_tar(1)^2 + pos_tar(2)^2 + pos_tar(3)^2);
 
 EE        = exp( -(...
     (.5*(xx - pos_tar(1))./waist_tar(1)).^2     ...
     + (.5*(yy - pos_tar(2))./waist_tar(2)).^2   ...
-    ).^n ) .*exp(1i*k0.*( xx.*cos(psi_x) + yy.*cos(psi_y) ));
+    ).^n ) .*exp(1i*( xx.*k_cen_x + yy.*k_cen_y ));
 
 figure(1)
 pcolor(xx, yy, abs(EE).^2)
@@ -67,8 +67,6 @@ k_x     = (-N_x/2:N_x/2-1) * dk_x;
 k_y     = (-N_y/2:N_y/2-1) * dk_y;
 [kk_x, kk_y] = meshgrid(k_x, k_y);
 
-k_cen_x     = (k0*cos(psi_x));
-k_cen_y     = (k0*cos(psi_y));
 EE          = EE .* exp(-1i*(k_cen_y.*yy + k_cen_x.*xx)); %** '-/+' here
 
 % Addin central frequency
