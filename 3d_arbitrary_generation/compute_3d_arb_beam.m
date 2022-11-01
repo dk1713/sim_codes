@@ -24,16 +24,16 @@ lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
 %% Target specification
 % distance from the top of the chip.
-pos_tar     = [30e-6, 10e-6, 50e-6];
+pos_tar     = [-30e-6, 20e-6, 100e-6];
 % estimated waist at the surface
-waist_tar   = [10e-6, 15e-6];
+waist_tar   = [5e-6, 10e-6];
 %% Init
 % 1. defining the domain
 L_x     = 200e-6;
 L_y     = 200e-6;
 
 N_x     = 2^10; 
-N_y     = N_x/2^5;
+N_y     = N_x/2^4;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -67,20 +67,13 @@ k_x     = (-N_x/2:N_x/2-1) * dk_x;
 k_y     = (-N_y/2:N_y/2-1) * dk_y;
 [kk_x, kk_y] = meshgrid(k_x, k_y);
 
-% Add in central frequency %** '-/+' here
+% computing for wave vectors for air
+kk_t    = sqrt((kk_x + k_cen_x).^2 + (kk_y + k_cen_y).^2);
+kk_z    = real( sqrt(k0^2 - kk_t.^2) );
 
-% computing for phases and 
-ky_air  = real( sqrt(k0^2 - k_t.^2) );
-ky_clad = real( sqrt(k0_clad^2 - k_t.^2) );
-ky_core = real( sqrt(k0_core^2 - k_t.^2) );
-phase_air   = asin(k_t/(n_air*k0));
-phase_clad  = asin(k_t/(n_clad*k0));
-phase_core  = asin(k_t/(n_core*k0));
-
+% checking for limits of central freqency
 fprintf('--------------------------------------------------------------\n')
 fprintf('Checking for limits of central wavenumber\n')
-kk_t    = sqrt((kk_x + k_cen_x).^2 + (kk_y + k_cen_y).^2); %** '+/-' here
-kk_z    = real(sqrt(k0^2 - kk_t.^2));
 fprintf('k_t(x) range: (%3.3e, %3.3e)',min(k_x+k_cen_x),max(k_x+k_cen_x))
 fprintf('\nk_cen_x  = %3.3e\n', k_cen_x)
 fprintf('k_t(y) range: (%3.3e, %3.3e)',min(k_y+k_cen_y),max(k_y+k_cen_y))
@@ -104,7 +97,7 @@ xline(pos_tar(1), 'r');yline(pos_tar(2), 'r');
 xline(0, 'k');yline(0, 'k');
 xline(L_x/4,'g');yline(L_y/4,'g');xline(-L_x/4,'g');yline(-L_y/4,'g');
 
-%% Select the domain of the grating surface
+%% Select the domain of the grating surface (Zooming in)
 Lg_x    = 100e-6;
 Lg_y    = 100e-6;
 
@@ -130,20 +123,30 @@ colorbar
 axis equal
 
 %% Propagate the field onto the grating plane
-sin_psi_x1 = k_cen_x/k0;
-sin_psi_y1 = k_cen_y/k0;
+% re-evaluating the Fourier domain
+dk_g_x  = 2*pi/Lg_x;
+dk_g_y  = 2*pi/Lg_y;
+k_g_x   = (-Ng_x/2:Ng_x/2-1) * dk_g_x;
+k_g_y   = (-Ng_y/2:Ng_y/2-1) * dk_g_y;
+[kk_g_x, kk_g_y] = meshgrid(k_g_x, k_g_y);
 
-sin_psi_x2 = n_air*sin_psi_x1/n_clad;
-sin_psi_y2 = n_air*sin_psi_y1/n_clad;
+% Propagating from surface to 1st boundary between cladding and core.
+[EE_g, k_cen_x, k_cen_y] = prop_boundary(EE_g, xx_g, yy_g, ...
+    k0*n_air, k0*n_clad, k_cen_x, k_cen_y, ...
+    kk_g_x, kk_g_y, n_air, n_clad, -h_clad, 's');
 
-k_cen_x = k0*n_clad*sin_psi_x2;
-k_cen_y = k0*n_clad*sin_psi_y2;
+% Propagating from 1st boundary to grating plane.
+[EE_g, k_cen_x, k_cen_y] = prop_boundary(EE_g, xx_g, yy_g, ...
+    k0*n_clad, k0*n_core, k_cen_x, k_cen_y, ...
+    kk_g_x, kk_g_y, n_clad, n_core, -h_core, 's');
 
-EE_g    = EE_g * exp(-1i*(k_cen_x*xx_g + k_cen_y*yy_g));
-
-EE_g_k  = apply_Fresnel(fftshift(fft2(fftshift(EE_g))),  ...
-    .* exp(1i*kk_z.*-1*h_clad); % propagation back onto the surface.
-EE      = fftshift(ifft2(fftshift(EE_k)))...
-    .* exp(1i*(k_cen_x.*xx + k_cen_y.*yy)); % add back central frequency.
+figure(4)
+pcolor(xx_g, yy_g, abs(EE_g).^2)
+shading flat
+xlabel('x')
+ylabel('y')
+title('Intensity on surface')
+colorbar
+axis equal
 
 %% Create 2D Bragg grating profile slices along the y-axis
