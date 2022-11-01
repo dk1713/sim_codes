@@ -24,7 +24,7 @@ lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
 %% Target specification
 % distance from the top of the chip.
-pos_tar     = [10e-6, 10e-6, 10e-6];
+pos_tar     = [30e-6, 10e-6, 50e-6];
 % estimated waist at the surface
 waist_tar   = [10e-6, 15e-6];
 %% Init
@@ -33,7 +33,7 @@ L_x     = 200e-6;
 L_y     = 200e-6;
 
 N_x     = 2^10; 
-N_y     = N_x;
+N_y     = N_x/2^5;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -41,13 +41,13 @@ y       = linspace(-.5*L_y, .5*L_y, N_y);
 % 2. defining the arbitrary beam
 n       = 1;
 [xx, yy]    = meshgrid(x, y);
-k_cen_x     = k0*pos_tar(1)/sqrt(pos_tar(1)^2 + pos_tar(2)^2 + pos_tar(3)^2);
-k_cen_y     = k0*pos_tar(2)/sqrt(pos_tar(1)^2 + pos_tar(2)^2 + pos_tar(3)^2);
+k_cen_x     = k0*pos_tar(1)/sqrt(pos_tar(1)^2+pos_tar(2)^2+pos_tar(3)^2);
+k_cen_y     = k0*pos_tar(2)/sqrt(pos_tar(1)^2+pos_tar(2)^2+pos_tar(3)^2);
 
 EE        = exp( -(...
     (.5*(xx - pos_tar(1))./waist_tar(1)).^2     ...
     + (.5*(yy - pos_tar(2))./waist_tar(2)).^2   ...
-    ).^n ) .*exp(1i*( xx.*k_cen_x + yy.*k_cen_y ));
+    ).^n );
 
 figure(1)
 pcolor(xx, yy, abs(EE).^2)
@@ -67,9 +67,16 @@ k_x     = (-N_x/2:N_x/2-1) * dk_x;
 k_y     = (-N_y/2:N_y/2-1) * dk_y;
 [kk_x, kk_y] = meshgrid(k_x, k_y);
 
-EE          = EE .* exp(-1i*(k_cen_y.*yy + k_cen_x.*xx)); %** '-/+' here
+% Add in central frequency %** '-/+' here
 
-% Addin central frequency
+% computing for phases and 
+ky_air  = real( sqrt(k0^2 - k_t.^2) );
+ky_clad = real( sqrt(k0_clad^2 - k_t.^2) );
+ky_core = real( sqrt(k0_core^2 - k_t.^2) );
+phase_air   = asin(k_t/(n_air*k0));
+phase_clad  = asin(k_t/(n_clad*k0));
+phase_core  = asin(k_t/(n_core*k0));
+
 fprintf('--------------------------------------------------------------\n')
 fprintf('Checking for limits of central wavenumber\n')
 kk_t    = sqrt((kk_x + k_cen_x).^2 + (kk_y + k_cen_y).^2); %** '+/-' here
@@ -83,7 +90,7 @@ fprintf('--------------------------------------------------------------\n')
 EE_k    = fftshift(fft2(fftshift(EE))) ...
     .* exp(1i*kk_z.*-1*pos_tar(3)); % propagation back onto the surface.
 EE      = fftshift(ifft2(fftshift(EE_k)))...
-    .* exp(1i*(k_cen_y.*yy + k_cen_x.*xx)); % add back central frequency.
+    .* exp(1i*(k_cen_x.*xx + k_cen_y.*yy)); % add back central frequency.
 
 figure(2)
 pcolor(xx, yy, abs(EE).^2)
@@ -122,5 +129,21 @@ title('Intensity on surface')
 colorbar
 axis equal
 
-%% Propagate the field by 
+%% Propagate the field onto the grating plane
+sin_psi_x1 = k_cen_x/k0;
+sin_psi_y1 = k_cen_y/k0;
+
+sin_psi_x2 = n_air*sin_psi_x1/n_clad;
+sin_psi_y2 = n_air*sin_psi_y1/n_clad;
+
+k_cen_x = k0*n_clad*sin_psi_x2;
+k_cen_y = k0*n_clad*sin_psi_y2;
+
+EE_g    = EE_g * exp(-1i*(k_cen_x*xx_g + k_cen_y*yy_g));
+
+EE_g_k  = apply_Fresnel(fftshift(fft2(fftshift(EE_g))),  ...
+    .* exp(1i*kk_z.*-1*h_clad); % propagation back onto the surface.
+EE      = fftshift(ifft2(fftshift(EE_k)))...
+    .* exp(1i*(k_cen_x.*xx + k_cen_y.*yy)); % add back central frequency.
+
 %% Create 2D Bragg grating profile slices along the y-axis
