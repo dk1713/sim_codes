@@ -1,7 +1,15 @@
 function E = gaussian_on_surface(varargin)
-%gaussian_on_surface: 
-%   Detailed explanation goes here
-% Assign input arguments
+%A function handle that defines the standard Gaussian beam onto a surface
+%given position of the beam waist and its distance away from the surface.
+%   Input:
+%   x       (1xn) x domain
+%   lam     (float) wavelength of the beam
+%   pos_foc (1x2) position of the focal point (beam waist)
+%   len_grat(float) length of the grating, < length of the x domain
+%   is_focussed (bool) True = narrow focussing, False = wide focussing
+%   Output:
+%   E       (1xn) field of Gaussian beam on the surface
+
 x = varargin{1}; lam = varargin{2}; n_prop = varargin{3}; 
 pos_foc = varargin{4}; len_grat = varargin{5};
 x_focus = pos_foc(1); y_focus = pos_foc(2);

@@ -131,12 +131,12 @@ k_g_y   = (-Ng_y/2:Ng_y/2-1) * dk_g_y;
 [kk_g_x, kk_g_y] = meshgrid(k_g_x, k_g_y);
 
 % Propagating from surface to 1st boundary between cladding and core.
-[EE_g, k_cen_x, k_cen_y, ~] = prop_boundary(EE_g, xx_g, yy_g, ...
+[EE_g, k_cen_x, k_cen_y] = prop_boundary(EE_g, xx_g, yy_g, ...
     k0*n_air, k0*n_clad, k_cen_x, k_cen_y, ...
     kk_g_x, kk_g_y, n_air, n_clad, -h_clad, 's');
 
 % Propagating from 1st boundary to grating plane.
-[EE_g, k_cen_x, k_cen_y, phase_g] = prop_boundary(EE_g, xx_g, yy_g, ...
+[EE_g, k_cen_x, k_cen_y] = prop_boundary(EE_g, xx_g, yy_g, ...
     k0*n_clad, k0*n_core, k_cen_x, k_cen_y, ...
     kk_g_x, kk_g_y, n_clad, n_core, -h_core, 's');
 
@@ -154,49 +154,49 @@ axis equal
 % 1. Integration over length, x
 % 2. diffraction angle
 
-power_geo = fftshift(ifft2(fftshift( ...
-    fftshift(fft2(fftshift(EE_g))).*sin(.5*pi+phase_g) )));
-power_geo = abs(power_geo.^2);
-power_ratio = trapz(xx_g(1,:), power_geo, 2);
-power_ratio = power_ratio/max(power_ratio);
-
-figure(5)
-plot(yy_g(:,1), power_ratio, 'x', 'markersize', 10);
-
-%% Compute for constant of normalisation
-
-for i = 1:length(power_ratio)
-    E_grat  = EE_g(i,:)*power_ratio(i);
-    
-    phase   = unwrap(angle(E_grat));
-    dphase  = k0*n_eff + c_diff(x, phase);
-    period  = 2*pi./abs(dphase);
-
-    E_grat  = exp(1i*k0*n_eff*x) .* E_grat;
-    Pz_amp  = abs(E_grat).^2;
-
-    % init
-    F       = griddedInterpolant(x, Pz_amp, 'spline');
-    fun     = @(x) F(x);
-    C       = 1/integral(fun, min(x), max(x));
-
-    % parameters in BTA
-    Lam     = period;
-    theta   = .5*(  asin(n_clad/n_core*(1/n_clad*sin(phi))) +.5*pi);
-    w_0     = 2e-6; % may need to change.
-    sigma   = .5*h_core;
-    beta    = 2*pi*n_eff/lam;
-    K       = 2*pi./Lam;
-    w_theta = w_0*sigma/sqrt(w_0^2 + sigma^2)/sin(2*theta);
-
-    denu = zeros(size(x));
-    for ii = 1:length(x)
-        denu(ii) = 1 - C * integral(fun, -100e-6, x(ii));
-    end
-
-    dng_amp = sqrt(C * fun(x) ./ denu);
-    dn_gs   = (lam*n_core/n_eff/w_theta/pi) * sqrt(w_0/sqrt(2*pi))*dng_amp;
-
-    max_dng = max(dn_gs); 
-
-end
+% power_geo = fftshift(ifft2(fftshift( ...
+%     fftshift(fft2(fftshift(EE_g))).*sin(.5*pi+phase_g) )));
+% power_geo = abs(power_geo.^2);
+% power_ratio = trapz(xx_g(1,:), power_geo, 2);
+% power_ratio = power_ratio/max(power_ratio);
+% 
+% figure(5)
+% plot(yy_g(:,1), power_ratio, 'x', 'markersize', 10);
+% 
+% %% Compute for constant of normalisation
+% 
+% for i = 1:length(power_ratio)
+%     E_grat  = EE_g(i,:)*power_ratio(i);
+%     
+%     phase   = unwrap(angle(E_grat));
+%     dphase  = k0*n_eff + c_diff(x, phase);
+%     period  = 2*pi./abs(dphase);
+% 
+%     E_grat  = exp(1i*k0*n_eff*x) .* E_grat;
+%     Pz_amp  = abs(E_grat).^2;
+% 
+%     % init
+%     F       = griddedInterpolant(x, Pz_amp, 'spline');
+%     fun     = @(x) F(x);
+%     C       = 1/integral(fun, min(x), max(x));
+% 
+%     % parameters in BTA
+%     Lam     = period;
+%     theta   = .5*(  asin(n_clad/n_core*(1/n_clad*sin(phi))) +.5*pi);
+%     w_0     = 2e-6; % may need to change.
+%     sigma   = .5*h_core;
+%     beta    = 2*pi*n_eff/lam;
+%     K       = 2*pi./Lam;
+%     w_theta = w_0*sigma/sqrt(w_0^2 + sigma^2)/sin(2*theta);
+% 
+%     denu = zeros(size(x));
+%     for ii = 1:length(x)
+%         denu(ii) = 1 - C * integral(fun, -100e-6, x(ii));
+%     end
+% 
+%     dng_amp = sqrt(C * fun(x) ./ denu);
+%     dn_gs   = (lam*n_core/n_eff/w_theta/pi) * sqrt(w_0/sqrt(2*pi))*dng_amp;
+% 
+%     max_dng = max(dn_gs); 
+% 
+% end
