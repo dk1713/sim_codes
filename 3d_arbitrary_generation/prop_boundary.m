@@ -1,4 +1,4 @@
-function [EE, k_cen_x, k_cen_y] = prop_boundary(EE, xx, yy, k1, k2, k_x, k_y, kk_x, kk_y, n1, n2, dist, pol)
+function [EE, k_cen_x, k_cen_y, phase_2] = prop_boundary(EE, xx, yy, k1, k2, k_x, k_y, kk_x, kk_y, n1, n2, dist, pol)
 %UNTITLED Summary of this function goes here
 %   Computing the propagated field by the path of 
 sin_psi_x1  = k_x/k1;
