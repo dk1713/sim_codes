@@ -37,7 +37,7 @@ L_x     = 200e-6;
 L_y     = 200e-6;
 
 N_x     = 2^10; 
-N_y     = N_x/2^4;
+N_y     = N_x/2^6;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -192,6 +192,7 @@ k_out   = [k_cen_x, k_cen_y, k_z];
 k_in    = [beta, 0, 0];
 theta_inc = .5*acos(dot(k_out,-k_in)/norm(k_out)/norm(k_in));
 
+figure(10)
 fprintf('computing for optimum dn_g < %2.4e... \n', dn_g);
 for i = 1:length(power_ratio)
     E_grat  = EE_g(i,:)*power_ratio(i);
@@ -207,54 +208,77 @@ for i = 1:length(power_ratio)
     fun     = @(x) F(x);
     C       = 1/integral(fun, min(xg), max(xg));
     max_dng = 1e2;
-    eta     = .2;
-
-    while 1e3*abs(dn_g - max_dng) > 1e-4
-        if eta < 0
-            fprintf('eta = %2.2f has to be positive value!\n', eta);
-            break
-        end
-        
-        denu = zeros(size(xg));
-        for ii = 1:length(xg)
-            denu(ii) = abs(1 - eta*C * integral(fun, 10*xg(1), xg(ii))); % may need abs to improve accuracy in error function.
-        end
-
-        kpump_n     = k_cen_x*cos(theta_grat) + k_cen_y*sin(theta_grat);
-        dng_amp     = sqrt(eta*C * fun(xg) ./ denu);
-        dng_amp     = 2*cos(theta_inc).^2 .* sin(2*theta_tilt) .* dng_amp;
-        dng_amp     = n_eff .* Lam ./ w .* sqrt(w_0 ./ sqrt(pi)) .* dng_amp;
-        
-        disp(max(dng_amp));
-        
-        dng_amp     = dng_amp ./ exp(-2*(w./sin(2*theta_tilt)).^2 ...
-            .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2);
-        
-        disp(max(exp(-2*(w./sin(2*theta_tilt)).^2 ...
-            .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2))); %%TODO problem area
-        
-        dng_temp    = dng_amp ./ (1 + cos(2*theta_inc).^2)./sqrt(sin(phi));
-        
-        dn_gs(i,:)  = dng_temp;
-        max_dng = max(dng_temp);
-        dng_diff = 1e3*(dn_g - max_dng);
-    break;
-        if dng_diff < 0
-            eta = eta - .05;
-        elseif dng_diff > 1
-            eta = eta + .05;
-        else
-            eta = eta + .01*dng_diff;
-        end
+    eta     = 1;
+    
+    denu = zeros(size(xg));
+    for ii = 1:length(xg)
+        denu(ii) = abs(1 - eta*C * integral(fun, xg(1), xg(ii))); % may need abs to improve accuracy in error function.
     end
-    break;
-    alpha_ana = sqrt(2*pi)*pi^2*w.^2*dng_temp.^2 ./ ...
-        w_0 ./ (2*cos(theta_inc)^2)^2 ./ Lam ./ sin(theta_tilt).^2 ...
-        ./ n_eff^2 .* sin(phi).* ...
-        exp(-2*(w./sin(2*theta_tilt)).^2 ...
-        .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2).^2;
-    efficiency(i) = 100 - 100*exp(-trapz(xg, alpha_ana));
+
+    kpump_n     = k_cen_x*cos(theta_grat) + k_cen_y*sin(theta_grat);
+    dng_amp     = sqrt(eta*C * fun(xg) ./ denu);
+    dng_amp     = 2*cos(theta_inc).^2 .* sin(2*theta_tilt) .* dng_amp;
+    dng_amp     = n_eff .* Lam ./ w .* sqrt(w_0 ./ sqrt(pi)) .* dng_amp;
+
+    dng_amp     = dng_amp ./ exp(-1*(w./sin(2*theta_tilt)).^2 ...
+        .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2);
+
+    dng_temp    = dng_amp ./ (1 + cos(2*theta_inc).^2) ./sqrt(sin(phi));
+    
+    hold on
+    plot(xg, dng_temp);
+%     plot(xg, 1./exp(-1*(w./sin(2*theta_tilt)).^2 ...
+%         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2));
+    xlabel('x');
+    ylabel('intensity');
+
+%     while 1e3*abs(dn_g - max_dng) > 1e-4
+%         if eta < 0
+%             fprintf('eta = %2.2f has to be positive value!\n', eta);
+%             break
+%         end
+%         
+%         denu = zeros(size(xg));
+%         for ii = 1:length(xg)
+%             denu(ii) = abs(1 - eta*C * integral(fun, 10*xg(1), xg(ii))); % may need abs to improve accuracy in error function.
+%         end
+% 
+%         kpump_n     = k_cen_x*cos(theta_grat) + k_cen_y*sin(theta_grat);
+%         dng_amp     = sqrt(eta*C * fun(xg) ./ denu);
+%         dng_amp     = 2*cos(theta_inc).^2 .* sin(2*theta_tilt) .* dng_amp;
+%         dng_amp     = n_eff .* Lam ./ w .* sqrt(w_0 ./ sqrt(pi)) .* dng_amp;
+%         
+%         disp(max(dng_amp));
+%         
+%         dng_amp     = dng_amp ./ exp(-2*(w./sin(2*theta_tilt)).^2 ...
+%             .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2);
+%         
+%         disp(max(exp(-2*(w./sin(2*theta_tilt)).^2 ...
+%             .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2))); %%TODO problem area
+%         
+%         dng_temp    = dng_amp ./ (1 + cos(2*theta_inc).^2)./sqrt(sin(phi));
+%         
+%         dn_gs(i,:)  = dng_temp;
+%         max_dng = max(dng_temp);
+%         dng_diff = 1e3*(dn_g - max_dng);
+%     break;
+%         if dng_diff < 0
+%             eta = eta - .05;
+%         elseif dng_diff > 1
+%             eta = eta + .05;
+%         else
+%             eta = eta + .01*dng_diff;
+%         end
+%     end
+%     break;
+%     alpha_ana = sqrt(2*pi)*pi^2*w.^2*dng_temp.^2 ./ ...
+%         w_0 ./ (2*cos(theta_inc)^2)^2 ./ Lam ./ sin(theta_tilt).^2 ...
+%         ./ n_eff^2 .* sin(phi).* ...
+%         exp(-2*(w./sin(2*theta_tilt)).^2 ...
+%         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2).^2;
+%     efficiency(i) = 100 - 100*exp(-trapz(xg, alpha_ana));
 end
+hold off
 
 % saving data needed:
 EE_grat = exp(-1i*beta*xg) .* EE_g;
