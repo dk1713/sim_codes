@@ -1,4 +1,4 @@
-function [theta_grat, theta_tilt] = grating_angles(varargin)
+function [theta_inc, theta_tilt] = grating_angles(varargin)
 % input: xtrav = [target_x,target_y,target_z]
 %        where x=pump propagation, z=transverse (in plane), y=vertical (out of plane)
 % output: grating period (units of lambda in material), grating direction, tilt angle
@@ -23,9 +23,9 @@ kg_y = kin_y-kout_y;
 kg_z = kin_z-kout_z;
 
 % grating direction (angle)
-theta_grat = atan(kg_y./kg_x);
+theta_inc = atan(kg_y./kg_x);
 
 % grating tilt angle w.r.t. vertical (=0 vertical, =90 [deg] horizontal)
-theta_tilt = pi/2 - acos(abs(kg_z)/sqrt(kg_x.^2+kg_y.^2+kg_z.^2));   
+theta_tilt = asin(abs(kg_z)/sqrt(kg_x.^2+kg_y.^2+kg_z.^2));   
 
 return
