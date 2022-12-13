@@ -19,28 +19,32 @@ dn_g    = 3e-3;
 % Heights of the layers [m]
 h_clad  = 15e-6;
 h_core  = 5e-6;
+sigma   = .5*h_core;
 
 lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
 
 % figure dimension control
-fig_pow = 1e3;
+fig_pow = 1e6;
 %% Target specification
 % distance from the top of the chip.
-pos_tar     = [-3e-3, 2e-3, 50e-3];
+pos_tar     = [-3e-6, 5e-6, 50e-6];
 
 % compute for angles in grating profiles:
-[theta_inc, theta_tilt] = grating_angles(pos_tar, k0);
+[theta_inc, theta_tilt, theta_grat] = grating_angles(pos_tar, k0);
+fprintf('theta_inc  = %2.2f\n', 180*theta_inc/pi);
+fprintf('theta_tilt = %2.2f\n', 180*theta_tilt/pi);
+fprintf('theta_grat = %2.2f\n', 180*theta_grat/pi);
 
 % estimated waist at the surface
-waist_tar   = [1e-3, 2e-3];
+waist_tar   = [2e-6, 3e-6];
 %% Init
 % 1. defining the domain
-L_x     = 40e-3;
-L_y     = 40e-3;
+L_x     = 80e-6;
+L_y     = 80e-6;
 
-N_x     = 2^10; 
-N_y     = N_x/2^5;
+N_x     = 2^9; 
+N_y     = N_x;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -59,8 +63,8 @@ EE        = exp( -(...
 figure(1)
 pcolor(fig_pow*xx, fig_pow*yy, abs(EE).^2)
 shading flat
-xlabel('x / [mm]')
-ylabel('y / [mm]')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -95,8 +99,8 @@ EE      = fftshift(ifft2(fftshift(EE_k)))...
 figure(2)
 pcolor(fig_pow*xx, fig_pow*yy, abs(EE).^2)
 shading flat
-xlabel('x / [mm]')
-ylabel('y / [mm]')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -106,8 +110,8 @@ xline(fig_pow*L_x/4,'g');yline(fig_pow*L_y/4,'g');
 xline(-fig_pow*L_x/4,'g');yline(-fig_pow*L_y/4,'g');
 
 %% Select the domain of the grating surface (Zooming in)
-Lg_x    = 20e-3;
-Lg_y    = 20e-3;
+Lg_x    = .5*L_x;
+Lg_y    = .5*L_y;
 
 Ng_x    = N_x/ceil(L_x/Lg_x);
 Ng_y    = N_y/ceil(L_y/Lg_y);
@@ -124,8 +128,8 @@ EE_g    = EE(index_y,index_x);
 figure(3)
 pcolor(fig_pow*xx_g, fig_pow*yy_g, abs(EE_g).^2)
 shading flat
-xlabel('x / [mm]')
-ylabel('y / [mm]')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -154,8 +158,8 @@ k_g_y   = (-Ng_y/2:Ng_y/2-1) * dk_g_y;
 figure(4)
 pcolor(fig_pow*xx_g, fig_pow*yy_g, abs(EE_g).^2)
 shading flat
-xlabel('x / [mm]')
-ylabel('y / [mm]')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -177,7 +181,7 @@ power_ratio = power_ratio/max(power_ratio);
 
 figure(5)
 plot(fig_pow*yy_g(:,1), power_ratio, 'x', 'markersize', 10);
-xlabel('y / [mm]');
+xlabel('y / [{\mu}m]');
 ylabel('power ratio');
 
 %% Compute for constant of normalisation
@@ -189,11 +193,10 @@ efficiency = zeros(size(power_ratio));
 % parameters in BTA
 beta    = k0*n_eff;
 w_0     = 2e-6; % may need to change.
-sigma   = .5*h_core;
 w       = w_0*sigma/sqrt(w_0^2 + sigma^2);
 
 % First find the eta needed for the computation
-eta     = .9;
+eta     = .01;
 
 fprintf('computing for optimum dn_g < %2.4e... \n', dn_g);
 for i = 1:length(power_ratio)
@@ -226,25 +229,18 @@ for i = 1:length(power_ratio)
     dng_amp     = 2*cos(theta_inc)^2 .*Lam /pi *sin(2*theta_tilt) /w ...
         *n_eff ./ (1 + cos(2*theta_tilt).^2) .*dng_amp;
     
-    hold on;
-    figure(30)
-    plot(fig_pow*xg, Lam*1e9);
-    xlabel('x / [mm]');
-    ylabel('period / [um]');
-    xlim([-6 6])
-    hold off;
-    
+    dn_gs(i,:) = dng_amp;
     hold on;
     figure(31)
     plot(fig_pow*xg, sqrt(denu));
-    xlabel('x / [mm]');
+    xlabel('x / [{\mu}m]');
     ylabel('power remain in');
     hold off;
     
     hold on;
     figure(32)
     plot(fig_pow*xg, abs(dng_amp));
-    xlabel('x /[mm]');
+    xlabel('x / [{\mu}m]');
     ylabel('index modulation, {\Delta}n_g');
     hold off;
     
@@ -297,8 +293,9 @@ for i = 1:length(power_ratio)
 %     efficiency(i) = 100 - 100*exp(-trapz(xg, alpha_ana));
 end
 
-% saving data needed:
+% % saving data needed:
 EE_grat = exp(-1i*beta*xg) .* EE_g;
 phase   = angle(EE_grat);
 % Required .mat files
-save('3d_gauss.mat', 'xg', 'yg', 'EE_grat', 'phase', 'period', 'dn_gs', 'efficiency');
+save('3d_gauss.mat', 'xx_g', 'yy_g', 'EE_grat', 'phase',...
+    'period', 'dn_gs', 'efficiency', 'theta_grat', 'phi');
