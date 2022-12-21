@@ -13,8 +13,13 @@ dn_g    = 3e-3;
 h_clad  = 15e-6;
 h_core  = 5e-6;
 sigma   = .5*h_core;
+lambda  = 780e-9;
 
 load('3d_gauss.mat');
+beta = 2*pi*n_eff/lambda;
+EE_grat = exp(-1i*beta*xx_g) .* EE_grat;
+phase   = angle(EE_grat);
+
 
 % init memo allo
 z_g     = linspace(-sigma, sigma, 2^7);

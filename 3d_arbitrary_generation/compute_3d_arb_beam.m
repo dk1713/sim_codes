@@ -43,7 +43,7 @@ waist_tar   = [2e-6, 3e-6];
 L_x     = 80e-6;
 L_y     = 80e-6;
 
-N_x     = 2^9; 
+N_x     = 2^11; 
 N_y     = N_x;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
@@ -230,19 +230,19 @@ for i = 1:length(power_ratio)
         *n_eff ./ (1 + cos(2*theta_tilt).^2) .*dng_amp;
     
     dn_gs(i,:) = dng_amp;
-    hold on;
-    figure(31)
-    plot(fig_pow*xg, sqrt(denu));
-    xlabel('x / [{\mu}m]');
-    ylabel('power remain in');
-    hold off;
-    
-    hold on;
-    figure(32)
-    plot(fig_pow*xg, abs(dng_amp));
-    xlabel('x / [{\mu}m]');
-    ylabel('index modulation, {\Delta}n_g');
-    hold off;
+%     hold on;
+%     figure(31)
+%     plot(fig_pow*xg, sqrt(denu));
+%     xlabel('x / [{\mu}m]');
+%     ylabel('power remain in');
+%     hold off;
+%     
+%     hold on;
+%     figure(32)
+%     plot(fig_pow*xg, abs(dng_amp));
+%     xlabel('x / [{\mu}m]');
+%     ylabel('index modulation, {\Delta}n_g');
+%     hold off;
     
     period(i,:) = Lam;
 
@@ -294,8 +294,9 @@ for i = 1:length(power_ratio)
 end
 
 % % saving data needed:
-EE_grat = exp(-1i*beta*xg) .* EE_g;
-phase   = angle(EE_grat);
+EE_grat = EE_g;
+% EE_grat = exp(-1i*beta*xg) .* EE_g;
+% phase   = angle(EE_grat);
 % Required .mat files
-save('3d_gauss.mat', 'xx_g', 'yy_g', 'EE_grat', 'phase',...
-    'period', 'dn_gs', 'efficiency', 'theta_grat', 'phi');
+save('3d_gauss.mat', 'xx_g', 'yy_g', 'EE_grat',...
+    'period', 'dn_gs', 'efficiency', 'theta_grat', 'phi', 'power_ratio');
