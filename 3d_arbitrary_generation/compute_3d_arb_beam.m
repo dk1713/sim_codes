@@ -24,10 +24,12 @@ lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
 %% Target specification
 % distance from the top of the chip.
-pos_tar     = [-30e-6, 20e-6, 100e-6];
+pos_tar     = [0e-6, 0e-6, 100e-6];
 
 % compute for angles in grating profiles:
 [theta_grat, theta_tilt] = grating_angles(pos_tar, k0);
+fprintf('theta_grat = %3.1f', 180*theta_grat/pi);
+fprintf('theta_tilt = %3.1f', 180*theta_tilt/pi);
 
 % estimated waist at the surface
 waist_tar   = [5e-6, 10e-6];
@@ -37,7 +39,7 @@ L_x     = 200e-6;
 L_y     = 200e-6;
 
 N_x     = 2^10; 
-N_y     = N_x/2^6;
+N_y     = N_x/2^5;
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -220,7 +222,7 @@ for i = 1:length(power_ratio)
     dng_amp     = 2*cos(theta_inc).^2 .* sin(2*theta_tilt) .* dng_amp;
     dng_amp     = n_eff .* Lam ./ w .* sqrt(w_0 ./ sqrt(pi)) .* dng_amp;
 
-    dng_amp     = dng_amp ./ exp(-1*(w./sin(2*theta_tilt)).^2 ...
+    dng_amp     = dng_amp ./ exp(-2*(w./sin(2*theta_tilt)).^2 ...
         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2);
 
     dng_temp    = dng_amp ./ (1 + cos(2*theta_inc).^2) ./sqrt(sin(phi));
