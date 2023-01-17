@@ -19,27 +19,46 @@ dn_g    = 3e-3;
 % Heights of the layers [m]
 h_clad  = 15e-6;
 h_core  = 5e-6;
+sigma   = .5*h_core;
 
 lam     = 780e-9;
 k0      = 2*pi*n_air/lam;
+
+% figure dimension control
+fig_pow = 1e6;
 %% Target specification
 % distance from the top of the chip.
+<<<<<<< HEAD
 pos_tar     = [0e-6, 0e-6, 100e-6];
 
 % compute for angles in grating profiles:
 [theta_grat, theta_tilt] = grating_angles(pos_tar, k0);
 fprintf('theta_grat = %3.1f', 180*theta_grat/pi);
 fprintf('theta_tilt = %3.1f', 180*theta_tilt/pi);
+=======
+pos_tar     = [-3e-6, 5e-6, 50e-6];
+
+% compute for angles in grating profiles:
+[theta_inc, theta_tilt, theta_grat] = grating_angles(pos_tar, k0);
+fprintf('theta_inc  = %2.2f\n', 180*theta_inc/pi);
+fprintf('theta_tilt = %2.2f\n', 180*theta_tilt/pi);
+fprintf('theta_grat = %2.2f\n', 180*theta_grat/pi);
+>>>>>>> 0688d416ccbe274792470d15964aa6b071cadf88
 
 % estimated waist at the surface
-waist_tar   = [5e-6, 10e-6];
+waist_tar   = [2e-6, 3e-6];
 %% Init
 % 1. defining the domain
-L_x     = 200e-6;
-L_y     = 200e-6;
+L_x     = 80e-6;
+L_y     = 80e-6;
 
+<<<<<<< HEAD
 N_x     = 2^10; 
 N_y     = N_x/2^5;
+=======
+N_x     = 2^11; 
+N_y     = N_x;
+>>>>>>> 0688d416ccbe274792470d15964aa6b071cadf88
 
 x       = linspace(-.5*L_x, .5*L_x, N_x);
 y       = linspace(-.5*L_y, .5*L_y, N_y);
@@ -56,10 +75,10 @@ EE        = exp( -(...
     ).^n );
 
 figure(1)
-pcolor(xx, yy, abs(EE).^2)
+pcolor(fig_pow*xx, fig_pow*yy, abs(EE).^2)
 shading flat
-xlabel('x')
-ylabel('y')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -92,20 +111,21 @@ EE      = fftshift(ifft2(fftshift(EE_k)))...
     .* exp(1i*(k_cen_x.*xx + k_cen_y.*yy)); % add back central frequency.
 
 figure(2)
-pcolor(xx, yy, abs(EE).^2)
+pcolor(fig_pow*xx, fig_pow*yy, abs(EE).^2)
 shading flat
-xlabel('x')
-ylabel('y')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
-xline(pos_tar(1), 'r');yline(pos_tar(2), 'r');
+xline(fig_pow*pos_tar(1), 'r');yline(fig_pow*pos_tar(2), 'r');
 xline(0, 'k');yline(0, 'k');
-xline(L_x/4,'g');yline(L_y/4,'g');xline(-L_x/4,'g');yline(-L_y/4,'g');
+xline(fig_pow*L_x/4,'g');yline(fig_pow*L_y/4,'g');
+xline(-fig_pow*L_x/4,'g');yline(-fig_pow*L_y/4,'g');
 
 %% Select the domain of the grating surface (Zooming in)
-Lg_x    = 100e-6;
-Lg_y    = 100e-6;
+Lg_x    = .5*L_x;
+Lg_y    = .5*L_y;
 
 Ng_x    = N_x/ceil(L_x/Lg_x);
 Ng_y    = N_y/ceil(L_y/Lg_y);
@@ -120,10 +140,10 @@ yg      = y(index_y);
 EE_g    = EE(index_y,index_x);
 
 figure(3)
-pcolor(xx_g, yy_g, abs(EE_g).^2)
+pcolor(fig_pow*xx_g, fig_pow*yy_g, abs(EE_g).^2)
 shading flat
-xlabel('x')
-ylabel('y')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -150,10 +170,10 @@ k_g_y   = (-Ng_y/2:Ng_y/2-1) * dk_g_y;
     kk_g_x, kk_g_y, n_clad, n_core, -h_core, 's');
 
 figure(4)
-pcolor(xx_g, yy_g, abs(EE_g).^2)
+pcolor(fig_pow*xx_g, fig_pow*yy_g, abs(EE_g).^2)
 shading flat
-xlabel('x')
-ylabel('y')
+xlabel('x / [{\mu}m]')
+ylabel('y / [{\mu}m]')
 title('Intensity on surface')
 colorbar
 axis equal
@@ -165,58 +185,57 @@ axis equal
 
 % init
 k_core  = k0*n_core;
-k_t     = sqrt( k_cen_x.^2 + k_cen_y.^2 ); % need to update to make it general later by finding the 1st derivative!
-k_z     = real( sqrt(k_core^2 - k_t.^2) );
+k_t     = real(sqrt( k_cen_x.^2 + k_cen_y.^2 )); % need to update to make it general later by finding the 1st derivative!
 % computing for diffraction angles (propagation angle in core layer)
-phi     = pi/2 - sign(k_cen_x)*acos(k_z/k_core);
+phi     = acos(k_t/k_core);
 
 power_geo   = abs(EE_g.^2) .* sin(phi);
-power_ratio = trapz(xx_g(1,:), power_geo, 2);
+power_ratio = trapz(xg, power_geo, 2);
 power_ratio = power_ratio/max(power_ratio);
 
 figure(5)
-plot(yy_g(:,1), power_ratio, 'x', 'markersize', 10);
+plot(fig_pow*yy_g(:,1), power_ratio, 'x', 'markersize', 10);
+xlabel('y / [{\mu}m]');
+ylabel('power ratio');
 
 %% Compute for constant of normalisation
 % init memo allo
 dn_gs   = zeros(size(EE_g));
 period  = zeros(size(EE_g));
 efficiency = zeros(size(power_ratio));
-beta    = k0*n_eff;
 
 % parameters in BTA
+beta    = k0*n_eff;
 w_0     = 2e-6; % may need to change.
-sigma   = .5*h_core;
 w       = w_0*sigma/sqrt(w_0^2 + sigma^2);
 
-% computing for incident angle relative to grating slices.
-k_out   = [k_cen_x, k_cen_y, k_z];
-k_in    = [beta, 0, 0];
-theta_inc = .5*acos(dot(k_out,-k_in)/norm(k_out)/norm(k_in));
+% First find the eta needed for the computation
+eta     = .01;
 
-figure(10)
 fprintf('computing for optimum dn_g < %2.4e... \n', dn_g);
 for i = 1:length(power_ratio)
-    E_grat  = EE_g(i,:)*power_ratio(i);
+    E_grat  = EE_g(i,:);
     
     phase   = unwrap(angle(E_grat));
     dphase  = beta + c_diff(xg, phase);
     Lam     = 2*pi./abs(dphase);
-    period(i,:) = Lam;
-    Pz_amp  = abs(E_grat).^2;
+    P_amp   = abs(E_grat).^2;
+    P_0     = power_ratio(i);
 
     % init for the loop
-    F       = griddedInterpolant(xg, Pz_amp, 'spline');
+    F       = griddedInterpolant(xg, P_amp, 'spline');
     fun     = @(x) F(x);
-    C       = 1/integral(fun, min(xg), max(xg));
-    max_dng = 1e2;
-    eta     = 1;
+    C       = eta*P_0/integral(fun, xg(1), xg(end));
+    max_dng = 1;
+    
     
     denu = zeros(size(xg));
     for ii = 1:length(xg)
-        denu(ii) = abs(1 - eta*C * integral(fun, xg(1), xg(ii))); % may need abs to improve accuracy in error function.
+        denu(ii) = P_0 - C*integral(fun, xg(1), xg(ii)); % may need abs to improve accuracy in error function.
     end
+    
 
+<<<<<<< HEAD
     kpump_n     = k_cen_x*cos(theta_grat) + k_cen_y*sin(theta_grat);
     dng_amp     = sqrt(eta*C * fun(xg) ./ denu);
     dng_amp     = 2*cos(theta_inc).^2 .* sin(2*theta_tilt) .* dng_amp;
@@ -226,13 +245,32 @@ for i = 1:length(power_ratio)
         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2);
 
     dng_temp    = dng_amp ./ (1 + cos(2*theta_inc).^2) ./sqrt(sin(phi));
+=======
+    dng_amp     = (sqrt(C * fun(xg) ./ denu));
+    dng_amp     = exp((w/sin(2*theta_tilt)).^2 ...
+        .*(2*cos(theta_tilt)^2*beta*cos(theta_inc) - 2*pi./Lam).^2/4) ... 
+        .*dng_amp;
+    dng_amp     = sqrt(w_0/sqrt(2*pi)./sin(phi)) .* dng_amp;
+    dng_amp     = 2*cos(theta_inc)^2 .*Lam /pi *sin(2*theta_tilt) /w ...
+        *n_eff ./ (1 + cos(2*theta_tilt).^2) .*dng_amp;
     
-    hold on
-    plot(xg, dng_temp);
-%     plot(xg, 1./exp(-1*(w./sin(2*theta_tilt)).^2 ...
-%         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2));
-    xlabel('x');
-    ylabel('intensity');
+    dn_gs(i,:) = dng_amp;
+%     hold on;
+%     figure(31)
+%     plot(fig_pow*xg, sqrt(denu));
+%     xlabel('x / [{\mu}m]');
+%     ylabel('power remain in');
+%     hold off;
+%     
+%     hold on;
+%     figure(32)
+%     plot(fig_pow*xg, abs(dng_amp));
+%     xlabel('x / [{\mu}m]');
+%     ylabel('index modulation, {\Delta}n_g');
+%     hold off;
+>>>>>>> 0688d416ccbe274792470d15964aa6b071cadf88
+    
+    period(i,:) = Lam;
 
 %     while 1e3*abs(dn_g - max_dng) > 1e-4
 %         if eta < 0
@@ -280,10 +318,11 @@ for i = 1:length(power_ratio)
 %         .*(kpump_n.*cos(theta_tilt).^2-pi./Lam).^2).^2;
 %     efficiency(i) = 100 - 100*exp(-trapz(xg, alpha_ana));
 end
-hold off
 
-% saving data needed:
-EE_grat = exp(-1i*beta*xg) .* EE_g;
-phase   = angle(EE_grat);
+% % saving data needed:
+EE_grat = EE_g;
+% EE_grat = exp(-1i*beta*xg) .* EE_g;
+% phase   = angle(EE_grat);
 % Required .mat files
-save('3d_gauss.mat', 'xg', 'yg', 'EE_grat', 'phase', 'period', 'dn_gs', 'efficiency');
+save('3d_gauss.mat', 'xx_g', 'yy_g', 'EE_grat',...
+    'period', 'dn_gs', 'efficiency', 'theta_grat', 'phi', 'power_ratio');
