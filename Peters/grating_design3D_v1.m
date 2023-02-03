@@ -15,7 +15,7 @@ k0 = 2*pi/lam;
 
 c = 3e8;
 
-neff = 1;  %NOT IMPLEMENTED EVERYWHERE           % effective index of fundamental mode
+neff = 1.4635;  %NOT IMPLEMENTED EVERYWHERE           % effective index of fundamental mode
 beta = neff*k0;         % propagation constant of mode
 w0 = 2e-6;              % waist of fundamental mode (vertical)
 sigma = 2e-6;           % waist of refractive index profile (vertical)
@@ -48,7 +48,7 @@ dng = 1;                % grating index contrast (=1 for design calculation; rea
 
     if (0==0)   % tilted Gaussian
         % al2 = 60 *pi/180;   % propagation angle, 90deg=vertical
-        ntar = [1 1 1];   % direction of propagation
+        ntar = [1 0 1];   % direction of propagation
         ntar = ntar/norm(ntar);
 
         w2 = 2.5e-6;
@@ -238,7 +238,7 @@ dng1 = dng1/(max(dng1(:)));
 
 loss = cumsum(dng1.^2 .* al1,2) * (xv(2)-xv(1));
 
-selpump = 3;
+selpump = 2;
 if (selpump==1)    % case 1: flat pump at input P=1, choose max dng for pump depletion
     dngbar_max = sqrt(1/max(loss(:,end)));
 
@@ -250,7 +250,7 @@ end
 if (selpump==2)    % case 2: flat pump at input P=1, choose max dng for fractionial pump depletion
     dngbar_max = sqrt(1/max(loss(:,end)));
 
-    dngbar = dngbar_max*sqrt(0.01);
+    dngbar = dngbar_max*sqrt(0.2);
     P = 1 + 0*xx;
     P = P - dngbar^2*loss;
     dng_full = real(dng1.*dngbar./sqrt(P));
@@ -263,31 +263,33 @@ if (selpump==3)    % case 3: optimised pump at input, choose max dng for 1/2 pum
     P = P - dngbar^2*loss;
     dng_full = real(dng1.*dngbar./sqrt(P));
 end
-
+%%
     figure(8)
-    subplot(221)
-    pcolor(xv,yv,P)    
-    xlabel('x'), ylabel('y')
-    title('Pump power')
+    ax1 = axes;
+    pcolor(1e6*xv,1e6*yv,P);
+    xlabel(ax1, 'x/ {\mu}m'), ylabel(ax1, 'y/ {\mu}m')
     shading flat
-    axis equal
-    colorbar
-
-    subplot(223)
-    pcolor(xv,yv,dng_full)   
-    xlabel('x'), ylabel('y')
-    title('Grating dng, pump depletion')
-    shading flat
-    axis equal
-    colorbar
-
-    subplot(224)
-    contour(xv,yv,dng_full)   
-    xlabel('x'), ylabel('y')
-    title('Grating dng, pump depletion')
-    shading flat
-    axis equal
-    colorbar
+    a = colorbar;
+    ylabel(a,'Intensity/ [a.u.]')
+    clim([.0 1])
+    ax1.FontSize = 30;
+    
+%%
+%     subplot(223)
+%     pcolor(xv,yv,dng_full)   
+%     xlabel('x'), ylabel('y')
+%     title('Grating dng, pump depletion')
+%     shading flat
+%     axis equal
+%     colorbar
+% 
+%     subplot(224)
+%     contour(xv,yv,dng_full)   
+%     xlabel('x'), ylabel('y')
+%     title('Grating dng, pump depletion')
+%     shading flat
+%     axis equal
+%     colorbar
 
 % combine this grating strength with phase information to produce schematic
 % of the full grating (to compare with the holographic results)
@@ -335,6 +337,38 @@ ngp = dng_fullp.*sin(2*pi/lamgrat0*(xxplot*cos(alphagrat0)+yyplot*sin(alphagrat0
 
 % finally, calculate the scattered field including phase information,
 % propagate to target position, check result
+%%
+f = figure(11);
+f.Position
+ax1 = axes;
+pl1  = pcolor(1e6*xv,1e6*yv,ng);
+shading interp
+clim([-.6, .6])
 
+ax2  = axes;
+pl2  = pcolor(1e6*xvp,1e6*zvp,ngp);
+shading interp
+% colormap(ax2, 'jet')
+ylim([-2.5, 2.5])
+clim([-.6, .6])
+
+ax1.XTick = [];
+
+% Define the size of the plot
+ax1_height = .7;
+ax2_height = .12;
+
+set(ax1, 'Position',[.13 .28 .685 ax1_height]);
+set(ax2, 'Position',[.13 .12 .685 ax2_height]);
+
+cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
+cb2 = colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+
+xlabel(ax2, 'x/ {\mu}m')
+ylabel(ax1, 'y/ {\mu}m')
+ylabel(cb1, '{\Delta}n_g')
+
+ax1.FontSize = 30;
+ax2.FontSize = 30;
 
 

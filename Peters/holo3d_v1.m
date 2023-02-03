@@ -26,7 +26,6 @@ end
 [xx,yy,zz] = meshgrid(xv,yv,zv);
 
 % pump field
-
 k1x = k0;
 w1 = 2e-6;
 w1y = 100*5.8e-6;
@@ -64,7 +63,7 @@ end
 
 if (0==0)   % tilted Gaussian
     % al2 = 60 *pi/180;   % propagation angle, 90deg=vertical
-    n = [0 0 1];   % direction of propagation
+    n = [1 0 1];   % direction of propagation
     n = n/norm(n);
 
     w2 = 2.5e-6;
@@ -140,5 +139,6 @@ else
 end
 shading flat
 axis equal
+colorbar
 
 end
