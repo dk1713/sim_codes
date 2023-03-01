@@ -48,7 +48,7 @@ dng = 1;                % grating index contrast (=1 for design calculation; rea
 
     if (0==0)   % tilted Gaussian
         % al2 = 60 *pi/180;   % propagation angle, 90deg=vertical
-        ntar = [1 0 1];   % direction of propagation
+        ntar = [0 0 1];   % direction of propagation
         ntar = ntar/norm(ntar);
 
         w2 = 2.5e-6;
@@ -263,6 +263,23 @@ if (selpump==3)    % case 3: optimised pump at input, choose max dng for 1/2 pum
     P = P - dngbar^2*loss;
     dng_full = real(dng1.*dngbar./sqrt(P));
 end
+
+%%
+    subplot(223)
+    pcolor(xv,yv,dng_full)   
+    xlabel('x'), ylabel('y')
+    title('Grating dng, pump depletion')
+    shading flat
+    axis equal
+    colorbar
+
+    subplot(224)
+    contour(xv,yv,dng_full)   
+    xlabel('x'), ylabel('y')
+    title('Grating dng, pump depletion')
+    shading flat
+    axis equal
+    colorbar
 %%
     figure(8)
     ax1 = axes;
@@ -271,26 +288,8 @@ end
     shading flat
     a = colorbar;
     ylabel(a,'Intensity/ [a.u.]')
-    clim([.0 1])
     ax1.FontSize = 30;
     
-%%
-%     subplot(223)
-%     pcolor(xv,yv,dng_full)   
-%     xlabel('x'), ylabel('y')
-%     title('Grating dng, pump depletion')
-%     shading flat
-%     axis equal
-%     colorbar
-% 
-%     subplot(224)
-%     contour(xv,yv,dng_full)   
-%     xlabel('x'), ylabel('y')
-%     title('Grating dng, pump depletion')
-%     shading flat
-%     axis equal
-%     colorbar
-
 % combine this grating strength with phase information to produce schematic
 % of the full grating (to compare with the holographic results)
 
@@ -302,9 +301,8 @@ zzplot = 0*xx;
 phi = angle(E2.*exp(-1i*k0*(ntar(1)*xxplot+ntar(2)*yyplot+ntar(3)*zzplot)));
 
 ng = dng_full.*sin(2*pi/lamgrat0*(xxplot*cos(alphagrat0)+yyplot*sin(alphagrat0)-zzplot*tan(alphatilt0)) - phi);
-
-    figure(9)
-    %subplot(221)
+figure(9)
+    subplot(221)
     pcolor(xv,yv,ng)    
     xlabel('x'), ylabel('y')
     title('Full grating ng')
@@ -326,8 +324,7 @@ dng_fullp = ones(length(zvp),1) * dng_fullp;
 
 ngp = dng_fullp.*sin(2*pi/lamgrat0*(xxplot*cos(alphagrat0)+yyplot*sin(alphagrat0)-zzplot*tan(alphatilt0)) - phip).*exp(-(zzplot/sigma).^2);
 
-    figure(10)
-    %subplot(221)
+    subplot(222)
     pcolor(xvp,zvp,ngp)    
     xlabel('x'), ylabel('z')
     title('Full grating ng')
@@ -343,14 +340,14 @@ f.Position
 ax1 = axes;
 pl1  = pcolor(1e6*xv,1e6*yv,ng);
 shading interp
-clim([-.6, .6])
+% clim([-.6, .6])
 
 ax2  = axes;
 pl2  = pcolor(1e6*xvp,1e6*zvp,ngp);
 shading interp
 % colormap(ax2, 'jet')
 ylim([-2.5, 2.5])
-clim([-.6, .6])
+% clim([-.6, .6])
 
 ax1.XTick = [];
 
