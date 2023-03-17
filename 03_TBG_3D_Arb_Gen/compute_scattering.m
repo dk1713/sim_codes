@@ -1,4 +1,4 @@
-function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng,neff ,kz,pol, direction)
+function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng,neff,kz,pol)
 % formula of power loss from tilted grating
 % input: arrays (all of same size) of: 
 %       local grating wavelength Lambda (m), 
@@ -13,16 +13,9 @@ function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng
 % NOTE: in output x=pump propagation direction, y=in-plane transverse, z=vertical
 %       but internally in this function y=vertical, z=transverse
 
-% based on scatteringrate3.m
-% v1: original version only, as in Dom's Opt. Express
-% v2: extension to input beam propagating at an angle
-% v3: further extension to grating angled with respect to propagation
-%     direction of pump
-
 plotfig = 0;    % for testing: =1 for detailed figures, =0 for no figures
 
 w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%% pump at an angle inside slab %%%%%%%%%%
@@ -34,16 +27,23 @@ al_prop = asin(kz/beta);       % propagation angle
 
 
 % incident angle relative to grating planes
-% ngrat = [-cos(theta), sin(theta), 0];     % normal to grating plane (x,y,z), then rotate in (x,z) plane by al_grat
+% ngrat = [-cos(theta), sin(theta), 0];     
+% normal to grating plane (x,y,z), then rotate in (x,z) plane by al_grat
 % nprop = [cos(al_prop), 0, sin(al_prop)];  % prop. direction
 
 ngratx = -cos(theta).*cos(al_grat);   
 ngraty = sin(theta);  
 ngratz = -cos(theta).*sin(al_grat);   
 
-npropx = cos(al_prop);  npropy = 0*npropx;    npropz = sin(al_prop);
+npropx = cos(al_prop);  npropy = 0*npropx;  npropz = sin(al_prop);
     
-al_inc = acos(-ngratx.*npropx);
+al_inc = acos(-ngratx.*npropx - ngraty.*npropy - (npropz.*ngratz));
+figure(112)
+pcolor(180*al_prop/pi)    
+xlabel('x'), ylabel('y')
+shading flat
+axis equal
+colorbar
 
 if plotfig
     figure(12)
@@ -57,9 +57,9 @@ end
 % define incident plane, i.e. its normal vector (normal to propagation and normal of grating)
 % ninc = ngrat x nprop
 
-nincx = ngraty .* npropz - ngratz.*npropy;
-nincy = ngratz .* npropx - ngratx.*npropz;
-nincz = ngratx .* npropy - ngraty.*npropx;
+nincx = ngraty.*npropz - ngratz.*npropy;
+nincy = ngratz.*npropx - ngratx.*npropz;
+nincz = ngratx.*npropy - ngraty.*npropx;
 
 nn = sqrt(nincx.^2+nincy.^2+nincz.^2);
 nincx = nincx./nn;
@@ -67,20 +67,17 @@ nincy = nincy./nn;
 nincz = nincz./nn;
 
 % input s polarisation (same as normal to incident plane)
-
 ninsx = nincx; 
 ninsy = nincy; 
 ninsz = nincz;
 
 % input p pol is normal to propagation direction and s-pol vector, ninp ~ nins x nprop
-
 ninpx = ninsy.*npropz - ninsz.*npropy;
 ninpy = ninsz.*npropx - ninsx.*npropz;
 ninpz = ninsx.*npropy - ninsy.*npropx;
 
 % propagation direction of scattered beam nscat = nprop - 2*ngrat*(nprop.ngrat)
-
-qprojection = npropx.*ngratx+npropy.*ngraty+npropz.*ngratz;
+qprojection = npropx.*ngratx + npropy.*ngraty + npropz.*ngratz;
 
 nscatx = npropx - 2*ngratx.*qprojection;
 nscaty = npropy - 2*ngraty.*qprojection;
@@ -138,9 +135,9 @@ end
 % input vertical (y) polarisation
 
 % direction of polarisation
-nex = direction(1);
-ney = direction(2);
-nez = direction(3);
+nex = 0;
+ney = 1;
+nez = 0;
 
 % project of polarisation on s and p
 

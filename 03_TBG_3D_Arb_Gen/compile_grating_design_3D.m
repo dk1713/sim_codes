@@ -58,6 +58,9 @@ colorbar
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
     n_out(1), n_out(2), n_out(3), n_in);
 Lam_grat0 = Lam_grat0 * lam;
+fprintf('grating period = %2.4e\n', Lam_grat0);
+fprintf('angle of grating rotation = %2.1f\n', alp_grat0*180/pi);
+fprintf('tilt angle = %2.1f\n', alp_tilt0*180/pi);
 
 % local propagation direction of target field, extracted from E-grid
 kx = -1i * apply_cen_1st_diff2(E1, dx, 1) ./ E1; kx = real(kx);
@@ -73,7 +76,7 @@ pol = 1;
 ky = 0*Lam_grat;     
 
 [al1, Ex1, Ey1, Ez1] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, [0,1,0]);
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
 
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 
@@ -93,6 +96,9 @@ colorbar
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
     n_out(1), n_out(2), n_out(3), n_in);
 Lam_grat0 = Lam_grat0 * lam;
+fprintf('grating period = %2.4e\n', Lam_grat0);
+fprintf('angle of grating rotation = %2.1f\n', alp_grat0*180/pi);
+fprintf('tilt angle = %2.1f\n', alp_tilt0*180/pi);
 
 % local propagation direction of target field, extracted from E-grid
 kx = -1i * apply_cen_1st_diff2(E2, dx, 1) ./ E2; kx = real(kx);
@@ -105,80 +111,80 @@ Lam_grat = Lam_grat * lam;
 % =1 horizontal input polarisation; =2 vertical input polarisation
 pol = 1;
 % transverse prop. constant of pump
-ky = 0*Lam_grat;     
+ky = beta*ones(size(Lam_grat));     
 
 [al2, Ex2, Ey2, Ez2] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, [1,0,0]);
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
 
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
 
 %% efficiencies figures
-% figure(5)
-% subplot(221)
-% pcolor(x, y, al1)    
-% xlabel('x'), ylabel('y')
-% title('Scattering efficiency al (1/m) for dng=1')
-% shading flat
-% axis equal
-% colorbar
-% 
-% subplot(223)
-% pcolor(x, y, al2)    
-% xlabel('x'), ylabel('y')
-% title('Scattering efficiency al (1/m) for dng=1')
-% shading flat
-% axis equal
-% colorbar
-% 
-% figure(6)
-% subplot(221)
-% pcolor(x, y, Ex1./E1norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ex (norm.)')
-% shading flat
-% axis equal
-% colorbar
-% 
-% subplot(222)
-% pcolor(x, y, Ey1./E1norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ey (norm.)')
-% shading flat
-% axis equal
-% colorbar
-% 
-% subplot(223)
-% pcolor(x, y, Ez1./E1norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ez (norm.)')
-% shading flat
-% axis equal
-% colorbar
-% 
-% figure(7)
-% subplot(221)
-% pcolor(x, y, Ex2./E2norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ex (norm.)')
-% shading flat
-% axis equal
-% colorbar
-% 
-% subplot(222)
-% pcolor(x, y, Ey2./E2norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ey (norm.)')
-% shading flat
-% axis equal
-% colorbar
-% 
-% subplot(223)
-% pcolor(x, y, Ez2./E2norm)    
-% xlabel('x'), ylabel('y')
-% title('Scattered field pol.: Ez (norm.)')
-% shading flat
-% axis equal
-% colorbar
+figure(5)
+subplot(221)
+pcolor(x, y, al1)    
+xlabel('x'), ylabel('y')
+title('Scattering efficiency al (1/m)')
+shading flat
+axis equal
+colorbar
+
+subplot(223)
+pcolor(x, y, al2)    
+xlabel('x'), ylabel('y')
+title('Scattering efficiency al (1/m)')
+shading flat
+axis equal
+colorbar
+
+figure(6)
+subplot(221)
+pcolor(x, y, Ex1./E1norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ex (norm.)')
+shading flat
+axis equal
+colorbar
+
+subplot(222)
+pcolor(x, y, Ey1./E1norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ey (norm.)')
+shading flat
+axis equal
+colorbar
+
+subplot(223)
+pcolor(x, y, Ez1./E1norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ez (norm.)')
+shading flat
+axis equal
+colorbar
+
+figure(7)
+subplot(221)
+pcolor(x, y, Ex2./E2norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ex (norm.)')
+shading flat
+axis equal
+colorbar
+
+subplot(222)
+pcolor(x, y, Ey2./E2norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ey (norm.)')
+shading flat
+axis equal
+colorbar
+
+subplot(223)
+pcolor(x, y, Ez2./E2norm)    
+xlabel('x'), ylabel('y')
+title('Scattered field pol.: Ez (norm.)')
+shading flat
+axis equal
+colorbar
 
 %%
 % from this, extract dng (to get correct E) - for no pump depletion, this is all
