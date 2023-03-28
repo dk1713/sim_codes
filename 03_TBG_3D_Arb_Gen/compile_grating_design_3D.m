@@ -43,6 +43,8 @@ y = (-.5*Ly: dy :.5*Ly);
 [xx, yy] = meshgrid(x, y);
 
 %% pump in x
+disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
+disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
 n_out = [0, 0, 1];
 E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
@@ -58,9 +60,9 @@ colorbar
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
     n_out(1), n_out(2), n_out(3), n_in);
 Lam_grat0 = Lam_grat0 * lam;
-fprintf('grating period = %2.4e\n', Lam_grat0);
-fprintf('angle of grating rotation = %2.1f\n', alp_grat0*180/pi);
-fprintf('tilt angle = %2.1f\n', alp_tilt0*180/pi);
+fprintf('grating period = %2.2e [m]\n', Lam_grat0);
+fprintf('angle of grating rotation = %2.1f [deg]\n', alp_grat0*180/pi);
+fprintf('tilt angle = %2.1f [deg]\n', alp_tilt0*180/pi);
 
 % local propagation direction of target field, extracted from E-grid
 kx = -1i * apply_cen_1st_diff2(E1, dx, 1) ./ E1; kx = real(kx);
@@ -79,8 +81,10 @@ ky = 0*Lam_grat;
     Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
 
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
-
+disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 %% pump in y
+disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
+disp('calculating grating profile with pump in y')
 n_in  = [0, 1, 0];
 n_out = [0, 0, 1];
 E2 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
@@ -96,9 +100,9 @@ colorbar
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
     n_out(1), n_out(2), n_out(3), n_in);
 Lam_grat0 = Lam_grat0 * lam;
-fprintf('grating period = %2.4e\n', Lam_grat0);
-fprintf('angle of grating rotation = %2.1f\n', alp_grat0*180/pi);
-fprintf('tilt angle = %2.1f\n', alp_tilt0*180/pi);
+fprintf('grating period = %2.2e [m]\n', Lam_grat0);
+fprintf('angle of grating rotation = %2.1f [deg]\n', alp_grat0*180/pi);
+fprintf('tilt angle = %2.1f [deg]\n', alp_tilt0*180/pi);
 
 % local propagation direction of target field, extracted from E-grid
 kx = -1i * apply_cen_1st_diff2(E2, dx, 1) ./ E2; kx = real(kx);
@@ -117,7 +121,7 @@ ky = beta*ones(size(Lam_grat));
     Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
 
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
-
+disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 %% efficiencies figures
 figure(5)
 subplot(221)
