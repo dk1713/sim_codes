@@ -1,4 +1,4 @@
-function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng,neff,kz,pol)
+function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng,neff,kz,pol,plotfig)
 % formula of power loss from tilted grating
 % input: arrays (all of same size) of: 
 %       local grating wavelength Lambda (m), 
@@ -13,15 +13,12 @@ function [al,Ex,Ey,Ez]=compute_scattering(Lambda,al_grat,theta,w0,sigma,beta,dng
 % NOTE: in output x=pump propagation direction, y=in-plane transverse, z=vertical
 %       but internally in this function y=vertical, z=transverse
 
-plotfig = 0;    % for testing: =1 for detailed figures, =0 for no figures
-
 w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%% pump at an angle inside slab %%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%kz = beta*(-0.3:0.01:0.3);     % transverse k
 kx = sqrt(beta^2-kz.^2);        % longitudinal k
 al_prop = asin(kz/beta);       % propagation angle
 
@@ -198,6 +195,8 @@ alphas3 = alphas3 .* exp(-2*(w./sin(2*theta)).^2 .*(kpumpnormal.*cos(theta).^2-p
 alphas3 = alphas3.*sin(phivar3d);
 
 alphap3 = alphas3 .* cos(2*al_inc).^2;
+
+
 
 if plotfig
     figure(26)

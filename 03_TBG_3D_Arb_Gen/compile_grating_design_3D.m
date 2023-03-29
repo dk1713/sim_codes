@@ -49,12 +49,12 @@ n_in  = [1, 0, 0];
 n_out = [0, 0, 1];
 E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
 
-figure(1)
-pcolor(x, y, abs(E1))    
-xlabel('x'), ylabel('y')
-shading flat
-axis equal
-colorbar
+% figure(1)
+% pcolor(x, y, abs(E1))    
+% xlabel('x'), ylabel('y')
+% shading flat
+% axis equal
+% colorbar
 
 % calculate central grating properties (period, rotation, tilt)
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
@@ -71,14 +71,14 @@ kz = sqrt(k0^2 - kx.^2 - ky.^2);
 
 [Lam_grat, alp_grat, alp_tilt] = compute_grating_angles(kx, ky, kz, n_in);
 Lam_grat = Lam_grat * lam;
- 
+
 % =1 horizontal input polarisation; =2 vertical input polarisation
 pol = 1;
 % transverse prop. constant of pump
 ky = 0*Lam_grat;     
 
 [al1, Ex1, Ey1, Ez1] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, 0);
 
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
@@ -86,15 +86,14 @@ disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in y')
 n_in  = [0, 1, 0];
-n_out = [0, 0, 1];
 E2 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
 
-figure(2)
-pcolor(x, y, abs(E1))    
-xlabel('x'), ylabel('y')
-shading flat
-axis equal
-colorbar
+% figure(2)
+% pcolor(x, y, abs(E1))    
+% xlabel('x'), ylabel('y')
+% shading flat
+% axis equal
+% colorbar
 
 % calculate central grating properties (period, rotation, tilt)
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
@@ -111,6 +110,11 @@ kz = sqrt(k0^2 - kx.^2 - ky.^2);
 
 [Lam_grat, alp_grat, alp_tilt] = compute_grating_angles(kx, ky, kz, n_in);
 Lam_grat = Lam_grat * lam;
+
+% To fix the issue with rotation.
+% figure(30)
+% pcolor(180*alp_grat/pi)
+% shading flat
  
 % =1 horizontal input polarisation; =2 vertical input polarisation
 pol = 1;
@@ -118,7 +122,7 @@ pol = 1;
 ky = beta*ones(size(Lam_grat));     
 
 [al2, Ex2, Ey2, Ez2] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, 0);
 
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
