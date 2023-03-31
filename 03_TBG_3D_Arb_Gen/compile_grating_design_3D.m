@@ -24,7 +24,7 @@ c       = 3e8;
 % effective index of fundamental mode
 n_eff   = 1.4635;
 % propagation constant of mode
-beta    = n_eff*k0;
+beta    = k0;
 % waist of fundamental mode (vertical)
 w0      = 2e-6;
 % waist of refractive index profile (vertical)
@@ -46,15 +46,8 @@ y = (-.5*Ly: dy :.5*Ly);
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
-n_out = [0, 0, 1];
+n_out = [-1, 0, 1];
 E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
-
-% figure(1)
-% pcolor(x, y, abs(E1))    
-% xlabel('x'), ylabel('y')
-% shading flat
-% axis equal
-% colorbar
 
 % calculate central grating properties (period, rotation, tilt)
 [Lam_grat0, alp_grat0, alp_tilt0] = compute_grating_angles(...
@@ -86,7 +79,8 @@ disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in y')
 n_in  = [0, 1, 0];
-E2 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
+% E2 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 30e-6);
+E2 = E1;
 
 % figure(2)
 % pcolor(x, y, abs(E1))    
@@ -169,6 +163,14 @@ shading flat
 axis equal
 colorbar
 
+subplot(224)
+pcolor(x, y, abs(E1).*Ey1./E1norm)
+xlabel('x'), ylabel('y')
+title('Scattered field (Ey)')
+shading flat
+axis equal
+colorbar
+
 figure(7)
 subplot(221)
 pcolor(x, y, Ex2./E2norm)    
@@ -190,6 +192,14 @@ subplot(223)
 pcolor(x, y, Ez2./E2norm)    
 xlabel('x'), ylabel('y')
 title('Scattered field pol.: Ez (norm.)')
+shading flat
+axis equal
+colorbar
+
+subplot(224)
+pcolor(x, y, abs(E2).*Ex2./E2norm)
+xlabel('x'), ylabel('y')
+title('Scattered field (Ex)')
 shading flat
 axis equal
 colorbar

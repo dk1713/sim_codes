@@ -245,7 +245,7 @@ if plotfig
 end
 
 if pol==1   % pump polarisation horizontal
-    al = pxp.^2.*alphap3+pxs.^2.*alphas3;
+    al = pxp.^2.*alphap3 + pxs.^2.*alphas3;
     Ex = Exx;
     Ey = Exz;
     Ez = Exy;
