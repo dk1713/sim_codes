@@ -46,7 +46,7 @@ y = (-.5*Ly: dy :.5*Ly);
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
-n_out = [-1, 0, 1];
+n_out = [-1, -1, 1];
 E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
 
 % calculate central grating properties (period, rotation, tilt)
@@ -121,7 +121,7 @@ ky = beta*ones(size(Lam_grat));
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 %% efficiencies figures
-figure(5)
+figure(5); clf;
 subplot(221)
 pcolor(x, y, al1)    
 xlabel('x'), ylabel('y')
@@ -138,7 +138,7 @@ shading flat
 axis equal
 colorbar
 
-figure(6)
+figure(6); clf;
 subplot(221)
 pcolor(x, y, Ex1./E1norm)    
 xlabel('x'), ylabel('y')
@@ -171,7 +171,7 @@ shading flat
 axis equal
 colorbar
 
-figure(7)
+figure(7); clf;
 subplot(221)
 pcolor(x, y, Ex2./E2norm)    
 xlabel('x'), ylabel('y')
@@ -212,14 +212,15 @@ colorbar
 %   NOTE: can also include pump profile here (e.g. Gaussian in transverse
 %   direction)
 
+% pump 1 (in x+ axis direction)
 dng1 = abs(E1)./E1norm;
 dng1 = dng1/(max(dng1(:)));
 
-figure(9)
+figure(9); clf;
 subplot(221)
 pcolor(x, y, dng1)    
 xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump depletion')
+title('Grating dng (norm.), no pump(x+) depletion')
 shading flat
 axis equal
 colorbar
@@ -227,18 +228,19 @@ colorbar
 subplot(222)
 contour(x, y, dng1)    
 xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump depletion')
+title('Grating dng (norm.), no pump(x+) depletion')
 shading flat
 axis equal
 colorbar
 
+% pump 2 (in y+ axis direction)
 dng2 = abs(E2)./E2norm;
 dng2 = dng2/(max(dng2(:)));
 
 subplot(223)
 pcolor(x, y, dng2)    
 xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump depletion')
+title('Grating dng (norm.), no pump(y+) depletion')
 shading flat
 axis equal
 colorbar
@@ -246,7 +248,7 @@ colorbar
 subplot(224)
 contour(x, y, dng2)    
 xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump depletion')
+title('Grating dng (norm.), no pump(y+) depletion')
 shading flat
 axis equal
 colorbar
