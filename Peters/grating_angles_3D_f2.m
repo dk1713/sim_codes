@@ -23,9 +23,8 @@ kgraty = kiny-kouty;
 
 kgratn = sqrt(kgratx.^2+kgraty.^2); % norm of grating K
 lamgrat = 2*pi./kgratn;             % grating period
+% alphagrat = atan2(kgraty, kgratx);   % grating direction (angle)
 alphagrat = atan(kgraty./kgratx);   % grating direction (angle)
-
-% normal to the grating planes
 
 ngratx = koutx-kinx;
 ngraty = kouty-kiny;

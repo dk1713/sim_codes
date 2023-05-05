@@ -21,7 +21,7 @@ function [al,Ex,Ey,Ez]=scatteringrate3_f(Lambda,al_grat,theta,kz,pol)
 
 global lam c k0 neff beta w0 sigma dng
 
-plotfig = 0;    % for testing: =1 for detailed figures, =0 for no figures
+plotfig = 1;    % for testing: =1 for detailed figures, =0 for no figures
 
 w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 
@@ -47,12 +47,12 @@ npropx = cos(al_prop);  npropy = 0*npropx;    npropz = sin(al_prop);
     
 al_inc = acos(-ngratx.*npropx);
 
-if plotfig
-    figure(12)
-    plot(al_prop*180/pi,al_inc*180/pi)
-    xlabel('propagation angle')
-    ylabel('incident angle rel. grating plane')
-end
+% if plotfig
+%     figure(12)
+%     plot(al_prop*180/pi,al_inc*180/pi)
+%     xlabel('propagation angle')
+%     ylabel('incident angle rel. grating plane')
+% end
 
 % define polarisation vectors of s and p, for input (pump) and output (Bragg scattered beam):
 
@@ -88,14 +88,14 @@ nscatx = npropx - 2*ngratx.*qprojection;
 nscaty = npropy - 2*ngraty.*qprojection;
 nscatz = npropz - 2*ngratz.*qprojection;
 
-if plotfig
-    figure(30)
-    plot(al_prop*180/pi,nscatx,al_prop*180/pi,nscaty,al_prop*180/pi,nscatz)
-    xlabel('propagation angle')
-    ylabel('x,y,z projections')
-    legend('x component','y component','z component')
-    title('propagation direction of beam reflected by single grating plane')
-end
+% if plotfig
+%     figure(30)
+%     plot(al_prop*180/pi,nscatx,al_prop*180/pi,nscaty,al_prop*180/pi,nscatz)
+%     xlabel('propagation angle')
+%     ylabel('x,y,z projections')
+%     legend('x component','y component','z component')
+%     title('propagation direction of beam reflected by single grating plane')
+% end
 
 % output s polarisation: same as input s polarisation
 
@@ -107,35 +107,35 @@ noutpx = noutsy.*nscatz - noutsz.*nscaty;
 noutpy = noutsz.*nscatx - noutsx.*nscatz;
 noutpz = noutsx.*nscaty - noutsy.*nscatx;
 
-if plotfig
-    figure(31)
-    plot(al_prop*180/pi,ninpx,al_prop*180/pi,ninpy,al_prop*180/pi,ninpz)
-    xlabel('propagation angle')
-    ylabel('x,y,z projections')
-    legend('x component','y component','z component')
-    title('p-polarised input, x,y,z components')
-
-    figure(32)
-    plot(al_prop*180/pi,ninsx,al_prop*180/pi,ninsy,al_prop*180/pi,ninsz)
-    xlabel('propagation angle')
-    ylabel('x,y,z projections')
-    legend('x component','y component','z component')
-    title('s-polarised input, x,y,z components')
-
-    figure(33)
-    plot(al_prop*180/pi,noutpx,al_prop*180/pi,noutpy,al_prop*180/pi,noutpz)
-    xlabel('propagation angle')
-    ylabel('x,y,z projections')
-    legend('x component','y component','z component')
-    title('p-polarised output, x,y,z components')
-
-    figure(34)
-    plot(al_prop*180/pi,noutsx,al_prop*180/pi,noutsy,al_prop*180/pi,noutsz)
-    xlabel('propagation angle')
-    ylabel('x,y,z projections')
-    legend('x component','y component','z component')
-    title('s-polarised output, x,y,z components')
-end
+% if plotfig
+%     figure(31)
+%     plot(al_prop*180/pi,ninpx,al_prop*180/pi,ninpy,al_prop*180/pi,ninpz)
+%     xlabel('propagation angle')
+%     ylabel('x,y,z projections')
+%     legend('x component','y component','z component')
+%     title('p-polarised input, x,y,z components')
+% 
+%     figure(32)
+%     plot(al_prop*180/pi,ninsx,al_prop*180/pi,ninsy,al_prop*180/pi,ninsz)
+%     xlabel('propagation angle')
+%     ylabel('x,y,z projections')
+%     legend('x component','y component','z component')
+%     title('s-polarised input, x,y,z components')
+% 
+%     figure(33)
+%     plot(al_prop*180/pi,noutpx,al_prop*180/pi,noutpy,al_prop*180/pi,noutpz)
+%     xlabel('propagation angle')
+%     ylabel('x,y,z projections')
+%     legend('x component','y component','z component')
+%     title('p-polarised output, x,y,z components')
+% 
+%     figure(34)
+%     plot(al_prop*180/pi,noutsx,al_prop*180/pi,noutsy,al_prop*180/pi,noutsz)
+%     xlabel('propagation angle')
+%     ylabel('x,y,z projections')
+%     legend('x component','y component','z component')
+%     title('s-polarised output, x,y,z components')
+% end
 
 % input vertical (y) polarisation
 
@@ -167,13 +167,13 @@ pxp = nex.*ninpx + ney.*ninpy + nez.*ninpz;
 % ylabel('power in s and p polarisation')
 % legend('z pol, s component','z pol, p component','y pol, s component','y pol, p component')
 
-if plotfig
-    figure(13)
-    plot(al_prop*180/pi,pxs.^2,al_prop*180/pi,pys.^2)
-    xlabel('propagation angle')
-    ylabel('power in s polarisation')
-    legend('z pol input','y pol input')
-end
+% if plotfig
+%     figure(13)
+%     plot(al_prop*180/pi,pxs.^2,al_prop*180/pi,pys.^2)
+%     xlabel('propagation angle')
+%     ylabel('power in s polarisation')
+%     legend('z pol input','y pol input')
+% end
 
 % output propagation direction and angle (from diffraction)
 
@@ -185,12 +185,12 @@ kdiffy = sqrt(beta^2-kdiffx.^2-kdiffz.^2);
 
 phivar3d = real(asin(kdiffy/beta));
 
-if plotfig
-    figure(14)
-    plot(al_prop*180/pi,phivar3d*180/pi)
-    xlabel('propagation angle')
-    ylabel('diffracted beam output angle')
-end
+% if plotfig
+%     figure(14)
+%     plot(al_prop*180/pi,phivar3d*180/pi)
+%     xlabel('propagation angle')
+%     ylabel('diffracted beam output angle')
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% scattering coefficients %%%

@@ -19,7 +19,7 @@ polout = 1;     % set output polarisation: 1=lin pol 1, 2=lin pol 2, 3=circ pol 
 
 c = 3e8;
 
-neff = 1;  %NOT IMPLEMENTED EVERYWHERE           % effective index of fundamental mode
+neff = 1.4635;  %NOT IMPLEMENTED EVERYWHERE           % effective index of fundamental mode
 beta = neff*k0;         % propagation constant of mode
 w0 = 2e-6;              % waist of fundamental mode (vertical)
 sigma = 2e-6;           % waist of refractive index profile (vertical)
@@ -75,7 +75,7 @@ pout2x(ntarz==1) = 1;
 pout2y(ntarz==1) = 0;  
 pout2z(ntarz==1) = 0;
 
-figure(1)
+figure(1); clf;
 subplot(231)
 pcolor(xx,yy,pout1x), shading flat, colorbar
 xlabel('x'), ylabel('y'), title('Pol 1 vector, x component')
@@ -129,7 +129,7 @@ lamgrat1 = lamgrat1 * lam;
 [lamgrat2,alphagrat2,alphatilt2] = grating_angles_3D_f2(ntary,-ntarx,ntarz);
 lamgrat2 = lamgrat2 * lam;
 
-figure(2)
+figure(2); clf;
 subplot(231)
 pcolor(xx,yy,lamgrat1/lam), shading flat, colorbar
 xlabel('x'), ylabel('y'), title('Grating 1 period \Lambda/\lambda')
@@ -188,7 +188,7 @@ dng2 = dng .* abs(A2);
 A2 = exp(1i*angle(A2));
 
 
-figure(3)   % remember: these pump strengths are for dng=1
+figure(3); clf;   % remember: these pump strengths are for dng=1
 subplot(221)
 pcolor(xx,yy,dng1), shading flat, colorbar
 xlabel('x'), ylabel('y'), title(['Pol. ' num2str(polout) ': Grating 1 strength dng_1'])
@@ -250,7 +250,7 @@ n2crossx = ( +2*pi./lamgrat1.*sin(alphagrat1p) ) / k0;
 n2crossz = (-1).^(upw2+1).*sqrt(1-n2crossx.^2-n2crossy.^2);
 
 
-figure(4)
+figure(4); clf;
 subplot(231)
 %pcolor(xx,yy,(real(n1crossx))), shading flat, colorbar
 pcolor(xx,yy,n1crossx.*(abs(real(n1crossz))>0) ), shading flat, colorbar
@@ -276,7 +276,7 @@ xlabel('x'), ylabel('y'), title('P2 on G1 scatter: direction, z component')
 
 
 
-figure(5)
+figure(5); clf;
 subplot(231)
 pcolor(xx,yy,al1.*dng1.^2), shading flat, colorbar  % |A1|=1 now
 xlabel('x'), ylabel('y'), title('P1: design scatter dng^2\alpha|A|^2')
