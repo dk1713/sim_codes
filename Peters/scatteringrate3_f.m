@@ -21,7 +21,7 @@ function [al,Ex,Ey,Ez]=scatteringrate3_f(Lambda,al_grat,theta,kz,pol)
 
 global lam c k0 neff beta w0 sigma dng
 
-plotfig = 1;    % for testing: =1 for detailed figures, =0 for no figures
+plotfig = 0;    % for testing: =1 for detailed figures, =0 for no figures
 
 w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 

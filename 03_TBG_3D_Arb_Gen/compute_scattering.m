@@ -19,7 +19,7 @@ w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 %%%%%%% pump at an angle inside slab %%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-kx = sqrt(beta^2-kz.^2);        % longitudinal k
+kx = sqrt(beta^2-kz.^2);       % longitudinal k
 al_prop = asin(kz/beta);       % propagation angle
 
 

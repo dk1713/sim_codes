@@ -17,7 +17,6 @@ function E = define_target_field(varargin)
     xx      = varargin{1};
     yy      = varargin{2};
     k       = varargin{3};
-    lam     = 2*pi/k;
     n_vec   = varargin{4};
     
     % target field amplitude - THIS SHOULD NOT HAVE ANY EFFECT
@@ -38,8 +37,8 @@ function E = define_target_field(varargin)
         % x=r in rotated frame = the orth. component to z
         xxr = sqrt(xx.^2+yy.^2 - zzr.^2);
         zzr = zzr - zfoc;
-
-        z_R = pi*w0^2/lam;
+        
+        z_R = w0^2 * k/2;
         w_z = w0*sqrt(1+(zzr/z_R).^2);
         eta = atan(zzr/z_R);
         % inverse of curvature, 1/R_z

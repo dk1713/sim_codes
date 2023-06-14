@@ -8,7 +8,7 @@
 global lam c k0 neff beta w0 sigma dng
 
 % parameters
-
+f
 lam = 780e-9;           % wavelength
 k0 = 2*pi/lam;
 
