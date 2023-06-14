@@ -32,7 +32,6 @@ sig     = 2e-6;
 % grating index contrast
 dn_g    = 1;            
 
-
 %% Define target beam (scalar), propagate to grating plane
 % grid in grating plane: horizontal cross section at z=0
 Lx = 40e-6;     dx = 0.05e-6;
@@ -42,11 +41,20 @@ y = (-.5*Ly: dy :.5*Ly);
 
 [xx, yy] = meshgrid(x, y);
 
-%% pump in x
+% direction vector for output beam
+n_out = [1, 0, 1];
+
+% Set the pump types with case 1, 2, 3:
+%   1. flat pump at input P=1, choose max dng for pump depletion
+%   2. flat pump at input P=1, choose max dng for 50% pump depletion (can
+%   be adjusted if needed. Change the number in 'sqrt')
+%   3. optimised pump at input
+setpump = 2;
+
+%% pump in x (pump 1)
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
-n_out = [1, 0, 1];
 % E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
 % not k0 but k = beta
 E1 = define_target_field(xx, yy, beta, n_out, 'gaussian', 2.5e-6, 50e-6);
@@ -77,19 +85,11 @@ ky = 0*Lam_grat;
 
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-%% pump in y (2)
+%% pump in y (pump 2)
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in y')
 n_in  = [0, 1, 0];
-% E2 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 30e-6);
 E2 = E1;
-
-% figure(2)
-% pcolor(x, y, abs(E1))    
-% xlabel('x'), ylabel('y')
-% shading flat
-% axis equal
-% colorbar
 
 % calculate central grating properties (period, rotation, tilt)
 [Lam_grat0_2, alp_grat0_2, alp_tilt0_2] = compute_grating_angles(...
@@ -106,13 +106,8 @@ kz = sqrt(beta^2 - kx.^2 - ky.^2);
 
 [Lam_grat, alp_grat, alp_tilt] = compute_grating_angles(kx, ky, kz, n_in);
 Lam_grat = Lam_grat * lam/n_eff;
-
-% To fix the issue with rotation.
-% figure(30)
-% pcolor(180*alp_grat/pi)
-% shading flat
  
-% =1 horizontal input polarisation; =2 vertical input polarisation
+% pol =1 horizontal input polarisation; =2 vertical input polarisation
 pol = 1;
 % transverse prop. constant of pump
 ky = beta*ones(size(Lam_grat));     
@@ -122,448 +117,281 @@ ky = beta*ones(size(Lam_grat));
 
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+
 %% efficiencies figures
-figure(5); clf;
-subplot(221)
-pcolor(x, y, al1)    
-xlabel('x'), ylabel('y')
-title('Scattering efficiency al (1/m)')
-shading flat
-axis equal
-colorbar
+figure(1); clf;
+subplot(221); pcolor(x, y, al1);
+xlabel('x'); ylabel('y');
+title('Scattering efficiency al for pump 1 (1/m)');
+shading flat; axis equal; colorbar;
 
-subplot(223)
-pcolor(x, y, al2)    
-xlabel('x'), ylabel('y')
-title('Scattering efficiency al (1/m)')
-shading flat
-axis equal
-colorbar
+subplot(223); pcolor(x, y, al2);
+xlabel('x'); ylabel('y');
+title('Scattering efficiency al for pump 2 (1/m)');
+shading flat; axis equal; colorbar;
 
-figure(6); clf;
-subplot(221)
-pcolor(x, y, Ex1./E1norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ex (norm.)')
-shading flat
-axis equal
-colorbar
+%% Ex, Ey, Ez components in first grating design (pump in x+ direction)
+figure(2); clf;
+subplot(221); pcolor(x, y, Ex1./E1norm);
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ex (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(222)
-pcolor(x, y, Ey1./E1norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ey (norm.)')
-shading flat
-axis equal
-colorbar
+subplot(222); pcolor(x, y, Ey1./E1norm);
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ey (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(223)
-pcolor(x, y, Ez1./E1norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ez (norm.)')
-shading flat
-axis equal
-colorbar
+subplot(223); pcolor(x, y, Ez1./E1norm);
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ez (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(224)
-pcolor(x, y, abs(E1).*Ey1./E1norm)
-xlabel('x'), ylabel('y')
-title('Scattered field (Ey)')
-shading flat
-axis equal
-colorbar
+subplot(224); pcolor(x, y, abs(E1).*Ey1./E1norm);
+xlabel('x'); ylabel('y');
+title('Scattered field (Ey)');
+shading flat; axis equal; colorbar;
 
-figure(7); clf;
-subplot(221)
-pcolor(x, y, Ex2./E2norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ex (norm.)')
-shading flat
-axis equal
-colorbar
+%% Ex, Ey, Ez components in first grating design (pump in y+ direction)
+figure(3); clf;
+subplot(221); pcolor(x, y, Ex2./E2norm)    
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ex (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(222)
-pcolor(x, y, Ey2./E2norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ey (norm.)')
-shading flat
-axis equal
-colorbar
+subplot(222); pcolor(x, y, Ey2./E2norm);
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ey (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(223)
-pcolor(x, y, Ez2./E2norm)    
-xlabel('x'), ylabel('y')
-title('Scattered field pol.: Ez (norm.)')
-shading flat
-axis equal
-colorbar
+subplot(223); pcolor(x, y, Ez2./E2norm);
+xlabel('x'); ylabel('y');
+title('Scattered field pol.: Ez (norm.)');
+shading flat; axis equal; colorbar;
 
-subplot(224)
-pcolor(x, y, abs(E2).*Ex2./E2norm)
-xlabel('x'), ylabel('y')
+subplot(224); pcolor(x, y, abs(E2).*Ex2./E2norm);
+xlabel('x'); ylabel('y');
 title('Scattered field (Ex)')
-shading flat
-axis equal
-colorbar
+shading flat; axis equal; colorbar;
 
-%%
-% from this, extract dng (to get correct E) - for no pump depletion, this is all
-%   NOTE: there would be different possibilities, because the target field is
-%   scalar, but the scattered field has polarisation, e.g. trying to match
-%   modulus of E-field, match one polarisation, ...
-%   NOTE: can also include pump profile here (e.g. Gaussian in transverse
-%   direction)
+%% Compute for dn_g for 2 grating designs
+% NOTE: there would be different possibilities, because the target field is
+% scalar, but the scattered field has polarisation, e.g. trying to match
+% modulus of E-field, match one polarisation, ...
+% NOTE: can also include pump profile here (e.g. Gaussian in transverse
+% direction)
 
 % pump 1 (in x+ axis direction)
 dng1 = abs(E1)./E1norm;
 dng1 = dng1/(max(dng1(:)));
 
-figure(9); clf;
-subplot(221)
-pcolor(x, y, dng1)    
-xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump(x+) depletion')
-shading flat
-axis equal
-colorbar
+figure(4); clf;
+subplot(221); pcolor(x, y, dng1); 
+xlabel('x'); ylabel('y');
+title('Grating dng (norm.), no pump(x+) depletion');
+shading flat; axis equal; colorbar;
 
-subplot(222)
-contour(x, y, dng1)    
-xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump(x+) depletion')
-shading flat
-axis equal
-colorbar
+subplot(222); contour(x, y, dng1);
+xlabel('x'); ylabel('y');
+title('Grating dng (norm.), no pump(x+) depletion');
+shading flat; axis equal; colorbar;
 
 % pump 2 (in y+ axis direction)
 dng2 = abs(E2)./E2norm;
 dng2 = dng2/(max(dng2(:)));
 
-subplot(223)
-pcolor(x, y, dng2)    
-xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump(y+) depletion')
-shading flat
-axis equal
-colorbar
+subplot(223); pcolor(x, y, dng2);
+xlabel('x'); ylabel('y');
+title('Grating dng (norm.), no pump(y+) depletion');
+shading flat; axis equal; colorbar;
 
-subplot(224)
-contour(x, y, dng2)    
-xlabel('x'), ylabel('y')
-title('Grating dng (norm.), no pump(y+) depletion')
-shading flat
-axis equal
-colorbar
+subplot(224); contour(x, y, dng2);
+xlabel('x'); ylabel('y');
+title('Grating dng (norm.), no pump(y+) depletion');
+shading flat; axis equal; colorbar;
 
-%% adding the dng shape and amplitude:
-%% in x (pump 1)
-% to include pump depletion, integrate the grating "loss" and scale dng
-% accordingly larger with grating propagation distance to maintain correct
-% E field
-setpump = 2;
-
+%% Computing for grating designs with different types of pump depletion:
+%% For pump in x+ direction. (pump 1)
 loss1 = cumsum(dng1.^2 .* al1,2) * (x(2)-x(1));
 
-if (setpump==1)    % case 1: flat pump at input P=1, choose max dng for pump depletion
+if (setpump==1)         % case 1
     dngbar_max = sqrt(1/max(loss1(:,end)));
-
     dngbar = dngbar_max*0.99;
     P = 1 + 0*xx;
     P = P - dngbar^2*loss1;
     dng_full = real(dng1.*dngbar./sqrt(P));
-end
-if (setpump==2)    % case 2: flat pump at input P=1, choose max dng for fractionial pump depletion
+elseif (setpump==2)     % case 2
     dngbar_max = sqrt(1/max(loss1(:,end)));
-
     dngbar = dngbar_max*sqrt(0.5);
     P = 1 + 0*xx;
     P = P - dngbar^2*loss1;
     dng_full = real(dng1.*dngbar./sqrt(P));
-end
-if (setpump==3)    % case 3: optimised pump at input, choose max dng for 1/2 pump depletion
+elseif (setpump==3)     % case 3
     dngbar_max = sqrt(1/max(loss1(:,end)));
-
     dngbar = dngbar_max*0.99;
     P = (dngbar_max^2*loss1(:,end))*ones(1,length(x));
     P = P - dngbar^2*loss1;
     dng_full = real(dng1.*dngbar./sqrt(P));
+else
+    fprintf('Invalid pump type selected for the pump in x');
+    return;
 end
 
-%%
-figure(10); clf;
-subplot(223)
-pcolor(x, y, dng_full)   
-xlabel('x'), ylabel('y')
-title('Grating dng, pump depletion')
-shading flat
-axis equal
-colorbar
-
-subplot(224)
-contour(x, y, dng_full)   
-xlabel('x'), ylabel('y')
-title('Grating dng, pump depletion')
-shading flat
-axis equal
-colorbar
-
-%% grating profile and pump plots
+%% plots for grating profile and pump in x
 figure(11); clf;
 ax1 = axes;
 pcolor(1e6*x, 1e6*y, P);
-xlabel(ax1, 'x/ {\mu}m'), ylabel(ax1, 'y/ {\mu}m')
-shading flat
+xlabel(ax1, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
+shading flat;
 a = colorbar;
-ylabel(a,'Intensity/ [a.u.]')
-% ax1.FontSize = 30;
-    
-% combine this grating strength with phase information to produce schematic
-% of the full grating (to compare with the holographic results)
+ylabel(a,'Intensity/ [a.u.]');
 
-xxplot = xx;
-yyplot = yy;
-zzplot = 0*xx;
+xxplot = xx; yyplot = yy; zzplot = 0*xx;
 
-%alphagrat0
-phi = angle(E1.*exp(-1i*beta*(n_out(1)*xxplot+n_out(2)*yyplot+n_out(3)*zzplot)));
+% alpha_grat0
+phi = angle(E1.*exp(-1i*beta*(...
+    n_out(1)*xxplot...
+    + n_out(2)*yyplot...
+    + n_out(3)*zzplot)));
 
-ng = dng_full.*sin(2*pi/Lam_grat0_1*(xxplot*cos(alp_grat0_1)+yyplot*sin(alp_grat0_1)-zzplot*tan(alp_tilt0_1)) - phi);
-figure(12); clf;
-subplot(221)
-pcolor(x, y, ng)    
-xlabel('x'), ylabel('y')
-title('Full grating ng')
-shading flat
-axis equal
-colorbar
+% Compute refractive index distribution, ng, in new rotated frame (phi)
+ng  = dng_full.*sin(2*pi/Lam_grat0_1*(...
+    xxplot*cos(alp_grat0_1) + yyplot*sin(alp_grat0_1) ...
+    - zzplot*tan(alp_tilt0_1)) - phi);
 
-x_p = xx(1,:);
-z_p = (-3:0.01:3)*1e-6;
+% compute for ng for y=0 line (sideview)
+x_p = xx(1,:); z_p = (-3:0.01:3)*1e-6;
+[xxplot,zzplot] = meshgrid(x_p,z_p); yyplot = 0*xxplot;
 
-[xxplot,zzplot] = meshgrid(x_p,z_p);
-yyplot = 0*xxplot;
-
-phip = phi((length(xx(:,1))+1)/2,:);     % phase of target field at y=0
+% phase of target field at y=0
+phip = phi((length(xx(:,1))+1)/2,:);
 phip = ones(length(z_p),1) * phip;
 
-dng_fullp = dng_full((length(xx(:,1))+1)/2,:);     % dng at y=0
+% dng at y=0
+dng_fullp = dng_full((length(xx(:,1))+1)/2,:);
 dng_fullp = ones(length(z_p),1) * dng_fullp;
 
-ngp = dng_fullp.*sin(2*pi/Lam_grat0_1*(xxplot*cos(alp_grat0_1)+yyplot*sin(alp_grat0_1)-zzplot*tan(alp_tilt0_1)) - phip).*exp(-(zzplot/sig).^2);
-subplot(222)
-pcolor(x_p,z_p,ngp)    
-xlabel('x'), ylabel('z')
-title('Full grating ng')
-shading flat
-axis equal
-colorbar
+ngp = dng_fullp.*sin(2*pi/Lam_grat0_1*(...
+    xxplot*cos(alp_grat0_1) + yyplot*sin(alp_grat0_1)...
+    - zzplot*tan(alp_tilt0_1)) - phip).*exp(-(zzplot/sig).^2);
 
-%%
-ng_temp = ng;
-ngp_temp = ngp;
+% Temp index distribution for superposed case.
+ng_temp = ng; ngp_temp = ngp;
 
-%%
-% finally, calculate the scattered field including phase information,
-% propagate to target position, check result
-%
-figure(13); clf;
-% f.Position % this shows the figure position
-ax1 = axes;
-pl1  = pcolor(1e6*x, 1e6*y, ng);
-shading interp
-% clim([-.6, .6])
-
-ax2  = axes;
-pl2  = pcolor(1e6*x_p, 1e6*z_p, ngp);
-shading interp
-% colormap(ax2, 'jet')
-ylim([-2.5, 2.5])
-% clim([-.6, .6])
+% Plot of the top and side view of the 2D planar grating design:
+figure(12); clf;
+ax1 = axes; pcolor(1e6*x, 1e6*y, ng); shading interp;
+ax2 = axes; pcolor(1e6*x_p, 1e6*z_p, ngp); shading interp;
 
 ax1.XTick = [];
-
 % Define the size of the plot
-ax1_height = .7;
-ax2_height = .12;
-
+ax1_height = .7; ax2_height = .12;
 set(ax1, 'Position',[.13 .28 .685 ax1_height]);
 set(ax2, 'Position',[.13 .12 .685 ax2_height]);
 
 cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-cb2 = colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m')
-ylabel(ax1, 'y/ {\mu}m')
+xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m'); 
 ylabel(cb1, '{\Delta}n_g')
-
-% ax1.FontSize = 30;
-% ax2.FontSize = 30;
-
-%% in y (pump 2)
-% to include pump depletion, integrate the grating "loss" and scale dng
-% accordingly larger with grating propagation distance to maintain correct
-% E field
-
+%% For pump in y+ direction. (pump 2)
+% The pump case set will be same as the pump 1 for preventing confusion.
 loss2 = cumsum(dng2.^2 .* al2,1) * (y(2)-y(1));
 
-if (setpump==1)    % case 1: flat pump at input P=1, choose max dng for pump depletion
+if (setpump==1)         % case 1
     dngbar_max = sqrt(1/max(loss2(end,:)));
-
     dngbar = dngbar_max*0.99;
     P = 1 + 0*yy;
     P = P - dngbar^2*loss2;
     dng_full = real(dng2.*dngbar./sqrt(P));
-end
-if (setpump==2)    % case 2: flat pump at input P=1, choose max dng for fractionial pump depletion
+elseif (setpump==2)     % case 2
     dngbar_max = sqrt(1/max(loss2(end,:)));
-
     dngbar = dngbar_max*sqrt(0.5);
     P = 1 + 0*yy;
     P = P - dngbar^2*loss2;
     dng_full = real(dng2.*dngbar./sqrt(P));
-end
-if (setpump==3)    % case 3: optimised pump at input, choose max dng for 1/2 pump depletion
+elseif (setpump==3)     % case 3
     dngbar_max = sqrt(1/max(loss2(end,:)));
-
     dngbar = dngbar_max*0.99;
     P = (dngbar_max^2*loss2(:,end))*ones(1,length(x));
     P = P - dngbar^2*loss2;
     dng_full = real(dng2.*dngbar./sqrt(P));
+else
+    fprintf('Invalid pump type selected for the pump in y');
+    return;
 end
 
-%%
-figure(20); clf;
-subplot(223)
-pcolor(x, y, dng_full)   
-xlabel('x'), ylabel('y')
-title('Grating dng, pump depletion')
-shading flat
-axis equal
-colorbar
-
-subplot(224)
-contour(x, y, dng_full)   
-xlabel('x'), ylabel('y')
-title('Grating dng, pump depletion')
-shading flat
-axis equal
-colorbar
-
-%% grating profile and pump plots
+%% plots for grating profile and pump in y
 figure(21); clf;
 ax1 = axes;
 pcolor(1e6*x, 1e6*y, P);
-xlabel(ax1, 'x/ {\mu}m'), ylabel(ax1, 'y/ {\mu}m')
-shading flat
+xlabel(ax1, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
+shading flat;
 a = colorbar;
-ylabel(a,'Intensity/ [a.u.]')
-% ax1.FontSize = 30;
+ylabel(a,'Intensity/ [a.u.]');
     
-% combine this grating strength with phase information to produce schematic
-% of the full grating (to compare with the holographic results)
+xxplot = xx; yyplot = yy; zzplot = 0*xx;
 
-xxplot = xx;
-yyplot = yy;
-zzplot = 0*xx;
+% alpha_grat0
+phi = angle(E2.*exp(-1i*beta*(...
+    n_out(1)*xxplot ...
+    + n_out(2)*yyplot ...
+    + n_out(3)*zzplot)));
 
-%alphagrat0
-phi = angle(E2.*exp(-1i*beta*(n_out(1)*xxplot+n_out(2)*yyplot+n_out(3)*zzplot)));
+% Compute refractive index distribution, ng, in new rotated frame (phi)
+ng = dng_full.*sin(2*pi/Lam_grat0_2*( ...
+    xxplot*cos(alp_grat0_2) + yyplot*sin(alp_grat0_2)...
+    - zzplot*tan(alp_tilt0_2)) - phi);
 
-ng = dng_full.*sin(2*pi/Lam_grat0_2*(xxplot*cos(alp_grat0_2)+yyplot*sin(alp_grat0_2)-zzplot*tan(alp_tilt0_2)) - phi);
-figure(22); clf;
-subplot(221)
-pcolor(x, y, ng)    
-xlabel('x'), ylabel('y')
-title('Full grating ng')
-shading flat
-axis equal
-colorbar
+% compute for ng for y=0 line (sideview)
+x_p = xx(1,:); z_p = (-3:0.01:3)*1e-6;
+[xxplot,zzplot] = meshgrid(x_p,z_p); yyplot = 0*xxplot;
 
-x_p = xx(1,:);
-z_p = (-3:0.01:3)*1e-6;
-
-[xxplot,zzplot] = meshgrid(x_p,z_p);
-yyplot = 0*xxplot;
-
-phip = phi((length(xx(:,1))+1)/2,:);     % phase of target field at y=0
+% phase of target field at y=0
+phip = phi((length(xx(:,1))+1)/2,:);     
 phip = ones(length(z_p),1) * phip;
 
-dng_fullp = dng_full((length(xx(:,1))+1)/2,:);     % dng at y=0
+% dng at y=0
+dng_fullp = dng_full((length(xx(:,1))+1)/2,:);     
 dng_fullp = ones(length(z_p),1) * dng_fullp;
 
-ngp = dng_fullp.*sin(2*pi/Lam_grat0_2*(xxplot*cos(alp_grat0_2)+yyplot*sin(alp_grat0_2)-zzplot*tan(alp_tilt0_2)) - phip).*exp(-(zzplot/sig).^2);
+ngp = dng_fullp.*sin(2*pi/Lam_grat0_2*(...
+    xxplot*cos(alp_grat0_2) + yyplot*sin(alp_grat0_2)...
+    - zzplot*tan(alp_tilt0_2)) - phip).*exp(-(zzplot/sig).^2);
 
-subplot(222)
-pcolor(x_p,z_p,ngp)    
-xlabel('x'), ylabel('z')
-title('Full grating ng')
-shading flat
-axis equal
-colorbar
+figure(22); clf;
+ax1 = axes; pcolor(1e6*x, 1e6*y, ng);
+shading interp;
 
-% finally, calculate the scattered field including phase information,
-% propagate to target position, check result
-%
-f = figure(23); clf;
-% f.Position % this shows the figure position
-ax1 = axes;
-pl1  = pcolor(1e6*x, 1e6*y, ng);
-shading interp
-% clim([-.6, .6])
+ax2  = axes; pcolor(1e6*x_p, 1e6*z_p, ngp);
+shading interp;
 
-ax2  = axes;
-pl2  = pcolor(1e6*x_p, 1e6*z_p, ngp);
-shading interp
-% colormap(ax2, 'jet')
-ylim([-2.5, 2.5])
-% clim([-.6, .6])
-
-ax1.XTick = [];
-
-% Define the size of the plot
-ax1_height = .7;
-ax2_height = .12;
-
+ax1.XTick = []; ax1_height = .7; ax2_height = .12;
 set(ax1, 'Position',[.13 .28 .685 ax1_height]);
 set(ax2, 'Position',[.13 .12 .685 ax2_height]);
 
 cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-cb2 = colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m')
-ylabel(ax1, 'y/ {\mu}m')
-ylabel(cb1, '{\Delta}n_g')
+xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
+ylabel(cb1, '{\Delta}n_g');
 
-%%
+%% Plot for superposed grating design
 ng_temp     = ng_temp + ng;
 ngp_temp    = ngp_temp + ngp;
 
-f = figure(33); clf;
-% f.Position % this shows the figure position
-ax1 = axes;
-pl1  = pcolor(1e6*x, 1e6*y, ng_temp);
-shading interp
-% clim([-.6, .6])
+figure(31); clf;
+ax1 = axes; pcolor(1e6*x, 1e6*y, ng_temp);
+shading interp;
+ax2 = axes; pcolor(1e6*x_p, 1e6*z_p, ngp_temp);
+shading interp;
 
-ax2  = axes;
-pl2  = pcolor(1e6*x_p, 1e6*z_p, ngp_temp);
-shading interp
-% colormap(ax2, 'jet')
-ylim([-2.5, 2.5])
-% clim([-.6, .6])
-
-ax1.XTick = [];
-
-% Define the size of the plot
-ax1_height = .7;
-ax2_height = .12;
-
+ax1.XTick = []; ax1_height = .7; ax2_height = .12;
 set(ax1, 'Position',[.13 .28 .685 ax1_height]);
 set(ax2, 'Position',[.13 .12 .685 ax2_height]);
 
 cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-cb2 = colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m')
-ylabel(ax1, 'y/ {\mu}m')
+xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
 ylabel(cb1, '{\Delta}n_g')
