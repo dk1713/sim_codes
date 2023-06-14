@@ -42,7 +42,7 @@ y = (-.5*Ly: dy :.5*Ly);
 [xx, yy] = meshgrid(x, y);
 
 % direction vector for output beam
-n_out = [1, 0, 1];
+n_out = [0, 1, 1];
 
 % Set the pump types with case 1, 2, 3:
 %   1. flat pump at input P=1, choose max dng for pump depletion
@@ -55,7 +55,6 @@ setpump = 2;
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
-% E1 = define_target_field(xx, yy, k0, n_out, 'gaussian', 2.5e-6, 50e-6);
 % not k0 but k = beta
 E1 = define_target_field(xx, yy, beta, n_out, 'gaussian', 2.5e-6, 50e-6);
 
@@ -81,8 +80,8 @@ pol = 1;
 ky = 0*Lam_grat;     
 
 [al1, Ex1, Ey1, Ez1] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, 0);
-
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
+fprintf('scattering rate = %2.4e\n', norm(al1));
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 %% pump in y (pump 2)
@@ -113,8 +112,8 @@ pol = 1;
 ky = beta*ones(size(Lam_grat));     
 
 [al2, Ex2, Ey2, Ez2] = compute_scattering(...
-    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol, 0);
-
+    Lam_grat, alp_grat, alp_tilt, w0, sig, beta, dn_g, n_eff, ky, pol);
+fprintf('scattering rate = %2.4e\n', norm(al2));
 E2norm = sqrt(Ex2.^2 + Ey2.^2 + Ez2.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 

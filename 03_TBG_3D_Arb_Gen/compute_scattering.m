@@ -119,12 +119,10 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     end
 
     % output s polarisation: same as input s polarisation
-
     noutsx = nincx; noutsy = nincy; noutsz = nincz;
 
     % p pol is normal to new propagation direction and s-pol vector,
     % noutp ~ nouts x nscat
-
     noutpx = noutsy.*nscatz - noutsz.*nscaty;
     noutpy = noutsz.*nscatx - noutsx.*nscatz;
     noutpz = noutsx.*nscaty - noutsy.*nscatx;
@@ -224,7 +222,7 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % project pump propgation constant onto grating direction (in x,z plane)
     kpumpnormal = kx.*cos(al_grat) + kz.*sin(al_grat);
-
+    
     alphas3 = sqrt(2*pi)./w0 ./ (2*cos(al_inc).^2).^2 ...
         .*(pi./Lambda).^2 .*(w./sin(2*theta)).^2 .*(dng./neff).^2 ...
         .* exp(-2*(w./sin(2*theta)).^2 ...
@@ -293,7 +291,7 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
         Ey = Exz;
         Ez = Exy;
     elseif pol == 2     % poump polarization vertical
-        al = pyp.^2.*alphap3+pys.^2.*alphas3;
+        al = pyp.^2.*alphap3 + pys.^2.*alphas3;
         Ex = Eyx;
         Ey = Eyz;
         Ez = Eyy;
