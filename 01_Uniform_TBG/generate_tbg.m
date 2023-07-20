@@ -1,23 +1,38 @@
-%% Load the grating file
+%% Generation of the dataset from COMSOL simulations
+% Preset COMSOL file: 'tbg_constant_dng.mph'
 model = mphload('tbg_constant_dng.mph');
-%           
+% This script generates the numerical dataset from the COMSOL simulation.
+% Note that this takes time and might need to check if preset COMSOL file
+% works beforehand.
+
+%% Inside the COMSOL file          
 %    -------------power_up--------------
 %    |                                 |
 % power_in                          power_out
 %    |                                 |
 %    ------------power_down-------------
+% The four data points are taken. Power coming in (input mode) and power
+% leakage and power flowed out. From tilted Bragg grating, we mainly want
+% power_up and power_out.
 %
+% power_in is set as 1W in COMSOL and power up and down is only taken when
+% tilted Bragg grating scatters light at 90[deg] (theta = 45[deg]).
 
 %% Taking up parameter data from .mph
-% for the filename labelling
+% for labelling
 L       = mphglobal(model, 'L');
 H       = mphglobal(model, 'H');
 L_g     = mphglobal(model, 'L_g');
 H_g     = mphglobal(model, 'H_g');
 n_cl    = mphglobal(model, 'n_cl');
-n_co    = mphglobal(model, 'n_co');
 sigma   = mphglobal(model, 'sigma');
 dn      = mphglobal(model, 'dn');
+% Note that the dimensions are in um so careful with the units.
+
+% Compute for varying dng, lambda, and theta, respectively,
+select_dng = 1;
+select_lam = 1;
+select_the = 1;
 
 % Selecting scattering angle [deg]
 phi_deg     = 90;
@@ -29,14 +44,15 @@ model_spec = [                      ...
     '_L_g_',    num2str(L_g),       ...
     '_H_g_',    num2str(H_g),       ...
     '_n_cl_',   num2str(n_cl),      ...
-    '_n_co_',   num2str(n_co),      ...
     '_sigma_',  num2str(sigma),     ...
     '_dn_',     num2str(dn),        ...
     '_phi_',    num2str(phi_deg),   ...
     ];
+
 %% Input Mode
 disp('v---------------------Computation started---------------------v')
 disp('Computing for width of the input mode')
+% setting no dng s.t. there is no back reflection. 
 model.param('par3').set( 'dn_g',   num2str(0) );
 model.study('std1').run
 n_eff   = mphglobal(model, 'real(ewfd.neff_1)');
@@ -63,11 +79,14 @@ w_0     = par(3);
 theta   = mphglobal(model, 'theta');
 
 % Checking for input mode
-figure(1)
-plot(y, normE, 'b', y, gauss(y, par(1), par(2), par(3)), '--r')
-xlabel('x [\mu m]')
-ylabel('y [V / m]')
-legend('numerical', 'fitting' )
+plot_check = 0;
+if plot_check
+    figure(1); clf;
+    plot(y, normE, 'b', y, gauss(y, par(1), par(2), par(3)), '--r')
+    xlabel('x [{\mu}m]')
+    ylabel('y [V / m]')
+    legend('numerical', 'fitting' )
+end
 disp('^--------------------Computation completed--------------------^')
 
 %% Init for three parametric sweep
@@ -76,30 +95,29 @@ y       = linspace(-.5*H, .5*H, total_size);
 x       = .5*L;
 xx      = [x*ones(size(y)); y];
 
-%% dn_g efficiency studies 
-disp('v---------------------Computation started---------------------v')
-fprintf('Computing for index Case: dn = %2.3e and varying dn_g\n', dn);
+%% dn_g efficiency studies
+    disp('v---------------------Computation started---------------------v')
+    fprintf('Computing for index Case: dn = %2.3e and varying dn_g\n', dn);
 
-dn_gs   = linspace(1, 5, 9) * 1e-3;
-num_of_iterations = length(dn_gs);
-power_loss_dng  = ones(size(dn_gs));
+    dn_gs   = linspace(1, 5, 9) * 1e-3;
+    num_of_iterations = length(dn_gs);
+    power_loss_dng  = ones(size(dn_gs));
 
-for iter = 1:num_of_iterations
-    fprintf('Computing for dng = %2.3e', dn_gs(iter));
-    fprintf('    (iteration #%i of %i iterations)\n',...
-        iter, num_of_iterations);
+    for iter = 1:num_of_iterations
+        fprintf('Computing for dng = %2.3e', dn_gs(iter));
+        fprintf('    (iteration #%i of %i iterations)\n',...
+            iter, num_of_iterations);
 
-    model.param('par3').set('dn_g', num2str(dn_gs(iter)));
-    model.study('std1').run;
-    
-    % Measuring time-average powerflow in y
-    Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
-    power_out   = trapz(y*1e-6, Poavx);
-    
-    power_loss_dng(iter)  = power_out/power_in;  
-end
-disp('^--------------------Computation completed--------------------^')
+        model.param('par3').set('dn_g', num2str(dn_gs(iter)));
+        model.study('std1').run;
 
+        % Measuring time-average powerflow in y
+        Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
+        power_out   = trapz(y*1e-6, Poavx);
+
+        power_loss_dng(iter)  = power_out/power_in;
+    end
+    disp('^--------------------Computation completed--------------------^')
 %% lambdas efficiency studies
 disp('v---------------------Computation started---------------------v')
 fprintf('Computing for index Case: dn = %2.3e and varying lambda\n', dn);
@@ -126,7 +144,6 @@ for iter = 1:num_of_iterations
     power_loss_lambda(iter)  = power_out/power_in;
 end
 disp('^--------------------Computation completed--------------------^')
-
 %% tilt angle efficiency studies
 disp('v---------------------Computation started---------------------v')
 fprintf('Computing for index Case: dn = %2.3e and varying theta\n', dn);
@@ -151,13 +168,12 @@ for iter = 1:num_of_iterations
     Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
     power_out   = trapz(y*1e-6, Poavx);
     
-    power_loss_theta(iter)  = power_out/power_in;  
+    power_loss_theta(iter)  = power_out/power_in;
 end
 disp('^--------------------Computation completed--------------------^')
-
-%%
+%% saving the dataset
 filename    =   ['data/tbg_efficiency'  model_spec '.mat'];
 save(filename, 'n_eff', 'w_0', 'power_in', 'theta',  ...
-    'dn_gs',    'power_loss_dng',           ...
-    'lambdas',  'power_loss_lambda',        ...
-    'thetas',   'power_loss_theta');
+    'dn_gs',    'power_left_dng',           ...
+    'lambdas',  'power_left_lambda',        ...
+    'thetas',   'power_left_theta');
