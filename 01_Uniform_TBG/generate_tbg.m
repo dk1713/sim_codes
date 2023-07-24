@@ -25,18 +25,19 @@ H       = mphglobal(model, 'H');
 L_g     = mphglobal(model, 'L_g');
 H_g     = mphglobal(model, 'H_g');
 n_cl    = mphglobal(model, 'n_cl');
+n_co    = mphglobal(model, 'n_co');
 sigma   = mphglobal(model, 'sigma');
 dn      = mphglobal(model, 'dn');
-% Note that the dimensions are in um so careful with the units.
+% Note that the dimensions are in um so careful with the unit.
 
-% Compute for varying dng, lambda, and theta, respectively,
-select_dng = 1;
-select_lam = 1;
-select_the = 1;
-
-% Selecting scattering angle [deg]
-phi_deg     = 90;
-model.param('par2').set( 'phi',     [num2str(phi_deg),      ' [deg]'] );
+%% init
+dn_g    = 4e-3;
+lam     = 780;
+phi_deg = 120;
+% Default values:
+model.param('par3').set( 'dn_g',    num2str(dn_g) );
+model.param('par2').set( 'lambda0', [num2str(lam), ' [nm]']);
+model.param('par2').set( 'phi',     [num2str(phi_deg), ' [deg]'] );
 
 model_spec = [                      ...
     '_L_',      num2str(L),         ...
@@ -44,14 +45,15 @@ model_spec = [                      ...
     '_L_g_',    num2str(L_g),       ...
     '_H_g_',    num2str(H_g),       ...
     '_n_cl_',   num2str(n_cl),      ...
+    '_n_co_',   num2str(n_co),      ...
     '_sigma_',  num2str(sigma),     ...
     '_dn_',     num2str(dn),        ...
     '_phi_',    num2str(phi_deg),   ...
     ];
 
 %% Input Mode
-disp('v---------------------Computation started---------------------v')
-disp('Computing for width of the input mode')
+disp('v---------------------Computation started---------------------v');
+disp('Computing for width of the input mode');
 % setting no dng s.t. there is no back reflection. 
 model.param('par3').set( 'dn_g',   num2str(0) );
 model.study('std1').run
@@ -87,7 +89,7 @@ if plot_check
     ylabel('y [V / m]')
     legend('numerical', 'fitting' )
 end
-disp('^--------------------Computation completed--------------------^')
+disp('^--------------------Computation completed--------------------^');
 
 %% Init for three parametric sweep
 total_size  = 2^9;
@@ -96,84 +98,81 @@ x       = .5*L;
 xx      = [x*ones(size(y)); y];
 
 %% dn_g efficiency studies
-    disp('v---------------------Computation started---------------------v')
-    fprintf('Computing for index Case: dn = %2.3e and varying dn_g\n', dn);
+disp('v---------------------Computation started---------------------v');
+fprintf('Computing for index Case: dn = %2.3e and varying dn_g\n', dn);
 
-    dn_gs   = linspace(1, 5, 9) * 1e-3;
-    num_of_iterations = length(dn_gs);
-    power_loss_dng  = ones(size(dn_gs));
+dn_gs           = linspace(1, 5, 9) * 1e-3;
+num_of_ite      = length(dn_gs);
+power_out_dng   = ones(size(dn_gs));
 
-    for iter = 1:num_of_iterations
-        fprintf('Computing for dng = %2.3e', dn_gs(iter));
-        fprintf('    (iteration #%i of %i iterations)\n',...
-            iter, num_of_iterations);
+for iter = 1:num_of_ite
+    fprintf('Computing for dng = %2.3e', dn_gs(iter));
+    fprintf('    (iteration #%i of %i iterations)\n',...
+        iter, num_of_ite);
 
-        model.param('par3').set('dn_g', num2str(dn_gs(iter)));
-        model.study('std1').run;
+    model.param('par3').set('dn_g', num2str(dn_gs(iter)));
+    model.study('std1').run;
 
-        % Measuring time-average powerflow in y
-        Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
-        power_out   = trapz(y*1e-6, Poavx);
+    % Measuring time-average powerflow in y
+    Poavx = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
+    power_out_dng(iter) = trapz(y*1e-6, Poavx);
+end
+disp('^--------------------Computation completed--------------------^');
 
-        power_loss_dng(iter)  = power_out/power_in;
-    end
-    disp('^--------------------Computation completed--------------------^')
 %% lambdas efficiency studies
-disp('v---------------------Computation started---------------------v')
+disp('v---------------------Computation started---------------------v');
 fprintf('Computing for index Case: dn = %2.3e and varying lambda\n', dn);
 
 % reset to default
-model.param('par3').set( 'dn_g',   num2str(1.2e-3) );
+model.param('par3').set( 'dn_g',   num2str(dn_g) );
 
-lambdas   = linspace(740, 820, 9);
-num_of_iterations = length(lambdas);
-power_loss_lambda  = ones(size(lambdas));
+lambdas         = linspace(740, 820, 9);
+num_of_ite      = length(lambdas);
+power_out_lam   = ones(size(lambdas));
 
-for iter = 1:num_of_iterations
+for iter = 1:num_of_ite
     fprintf('Computing for lambda = %4.1f [nm]', lambdas(iter));
     fprintf('    (iteration #%i of %i iterations)\n', ...
-        iter, num_of_iterations);
+        iter, num_of_ite);
     
     model.param('par2').set('lambda0', [num2str(lambdas(iter)), ' [nm]']);
     model.study('std1').run;
     
     % Measuring time-average powerflow in y
-    Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
-    power_out   = trapz(y*1e-6, Poavx);
-    
-    power_loss_lambda(iter)  = power_out/power_in;
+    Poavx = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
+    power_out_lam(iter) = trapz(y*1e-6, Poavx);
 end
-disp('^--------------------Computation completed--------------------^')
+disp('^--------------------Computation completed--------------------^');
+
 %% tilt angle efficiency studies
-disp('v---------------------Computation started---------------------v')
+disp('v---------------------Computation started---------------------v');
 fprintf('Computing for index Case: dn = %2.3e and varying theta\n', dn);
 
 % reset to default
-model.param('par2').set( 'lambda0',   [num2str(780), ' [nm]']);
+model.param('par2').set( 'lambda0',   [num2str(lam), ' [nm]']);
 
 theta_deg   = .5*phi_deg;
 thetas      = linspace(theta_deg - 4, theta_deg + 4, 9);
-num_of_iterations = length(thetas);
-power_loss_theta  = ones(size(thetas));
+num_of_ite = length(thetas);
+power_out_the  = ones(size(thetas));
 
-for iter = 1:num_of_iterations
+for iter = 1:num_of_ite
     fprintf('Computing for theta = %4.1f [deg]', thetas(iter));
     fprintf('    (iteration #%i of %i iterations)\n', ...
-        iter, num_of_iterations);
+        iter, num_of_ite);
 
     model.param('par2').set('theta', [num2str(thetas(iter)), ' [deg]']);
     model.study('std1').run;
     
     % Measuring time-average powerflow in y
-    Poavx       = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
-    power_out   = trapz(y*1e-6, Poavx);
-    
-    power_loss_theta(iter)  = power_out/power_in;
+    Poavx = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
+    power_out_the(iter) = trapz(y*1e-6, Poavx);
 end
-disp('^--------------------Computation completed--------------------^')
+disp('^--------------------Computation completed--------------------^');
+
 %% saving the dataset
 filename    =   ['data/tbg_efficiency'  model_spec '.mat'];
 save(filename, 'n_eff', 'w_0', 'power_in', 'theta',  ...
-    'dn_gs',    'power_left_dng',           ...
-    'lambdas',  'power_left_lambda',        ...
-    'thetas',   'power_left_theta');
+    'dn_gs',    'power_out_dng',           ...
+    'lambdas',  'power_out_lam',        ...
+    'thetas',   'power_out_the');
