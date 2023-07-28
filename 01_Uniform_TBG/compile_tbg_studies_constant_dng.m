@@ -1,28 +1,9 @@
-%% Load the grating data
-L       = 120;
-H       = 35;
-L_g     = 100;
-H_g     = 5;
-n_cl    = 1.4555;
-n_co    = 1.4608;
+%% Init
 sigma   = 3;
 dn      = 5e-3;
 
-model_spec = [...
-    '_L_',      num2str(L), ...
-    '_H_',      num2str(H), ...
-    '_L_g_',    num2str(L_g), ...
-    '_H_g_',    num2str(H_g), ...
-    '_n_cl_',   num2str(n_cl), ...
-    '_n_co_',   num2str(n_co), ...
-    '_sigma_',  num2str(sigma), ...
-    '_dn_',     num2str(dn), ...
-    ];
-filename    = ['data/tbg_powerflow'  model_spec '.mat'];
-load(filename);
-
 phi     = 90*pi/180;
-theta   = 45*pi/180;
+theta   = .5*phi;
 dn_g    = 1.2e-3;
 lam     = 780*1e-3;
 Lam     = lam/(n_cl * cos(phi) + n_eff);
