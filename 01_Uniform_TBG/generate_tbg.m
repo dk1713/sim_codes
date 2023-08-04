@@ -31,7 +31,7 @@ dn      = mphglobal(model, 'dn');
 % Note that the dimensions are in um so careful with the unit.
 
 %% init
-dn_g    = 4e-3;
+dn_g    = 5e-3;
 lam     = 780;
 phi_deg = 120;
 % Default values:
@@ -81,7 +81,7 @@ w_0     = par(3);
 theta   = mphglobal(model, 'theta');
 
 % Checking for input mode
-plot_check = 0;
+plot_check = 1;
 if plot_check
     figure(1); clf;
     plot(y, normE, 'b', y, gauss(y, par(1), par(2), par(3)), '--r')
@@ -140,7 +140,19 @@ for iter = 1:num_of_ite
     
     % Measuring time-average powerflow in y
     Poavx = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
-    power_out_lam(iter) = trapz(y*1e-6, Poavx);
+    power_out = trapz(y*1e-6, Poavx);
+    
+    % input
+    x       = -.5*L;
+    xx      = [x*ones(size(y)); y];
+    Poavx   = mphinterp(model, 'ewfd.Poavx', 'coord', xx);
+    power0  = trapz(y*1e-6, Poavx);
+    
+    power_out_lam(iter) = power_out/power0;
+    
+    % reset
+    x       = .5*L;
+    xx      = [x*ones(size(y)); y];
 end
 disp('^--------------------Computation completed--------------------^');
 

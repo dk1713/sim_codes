@@ -70,7 +70,7 @@ w_0s            = zeros(size(lambdas));
 phis            = zeros(size(lambdas));
 
 % setting higher dng
-dng = 5e-3;
+dng = 3e-3;
 model.param('par3').set( 'dn_g',   num2str(dng) );
 
 % Selecting scattering angle [deg]

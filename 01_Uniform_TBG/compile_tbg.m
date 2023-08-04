@@ -10,7 +10,7 @@ dn      = 5e-3;
 lam     = 780*1e-3;
 
 % Changing for dataset depends on dng
-dn_g    = 4e-3;
+dn_g    = 1e-3;
 
 % size
 grid_size = 2^11;
@@ -86,7 +86,8 @@ for iter = 1:length(phis_deg)
     lams_ana(iter,:) = lambdass*1e3;
     lams_num(iter,:) = lambdas;
     refl_lam_ana(iter,:) = 100*(1 - 10.^(-alpha_ana*80/log(10)));
-    refl_lam_num(iter,:) = 100*(1 - power_out_lam./power_in);
+%     refl_lam_num(iter,:) = 100*(1 - power_out_lam./power_in);
+    refl_lam_num(iter,:) = 100*(1 - power_out_lam);
     
     [hm_lam, x_hm_lam, fwhm_lam] = find_fwhm(lambdass*1e3, refl_lam_ana(iter,:));
     fprintf('FWHM (lambda)  = %2.2f     [nm]\n', fwhm_lam);
