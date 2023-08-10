@@ -24,7 +24,7 @@ dn      = mphglobal(model, 'dn');
 %% init
 dn_g    = 3e-3;
 lam     = 780;
-phi_deg = 90;
+phi_deg = 120;
 % Default values:
 model.param('par3').set( 'dn_g',    num2str(dn_g) );
 model.param('par2').set( 'lambda0', [num2str(lam), ' [nm]']);
