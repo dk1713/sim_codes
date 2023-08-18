@@ -14,43 +14,50 @@ dn_g    = 3e-3;
 
 % size
 grid_size = 2^11;
-phi_deg = 90;
-    
-%% Load the grating data
-model_spec = [...
-    '_L_',      num2str(L), ...
-    '_H_',      num2str(H), ...
-    '_L_g_',    num2str(L_g), ...
-    '_H_g_',    num2str(H_g), ...
-    '_n_cl_',   num2str(n_cl), ...
-    '_n_co_',   num2str(n_co), ...
-    '_sigma_',  num2str(sigma), ...
-    '_dn_',     num2str(dn), ...
-    '_phi_',    num2str(phi_deg),   ...
-    ];
-filename    = ['data/tbg_sigma'  model_spec '.mat'];
-load(filename);
+phi_degs = [60, 90, 120];
 
-% common parameters
-phi     = phi_deg*pi/180;
-Lam     = lam/(n_cl * cos(phi) + n_eff);
-K       = 2 * pi./Lam;
-theta   = .5*acos(lam/n_eff/Lam - 1);
+sigs_ana        = zeros(length(phi_degs), grid_size);
+sigs_num        = zeros(length(phi_degs), 10);
+refl_sig_ana    = sigs_ana;
+refl_sig_num    = sigs_num;
 
-% 1 dn_g efficiency studies
-sigmass = linspace(0, 6, grid_size);
-kappa   = dn_g/n_eff;
-beta    = 2 * pi * n_eff/lam;
+for ite = 1:length(phi_degs)
+    % Load the grating data
+    model_spec = [...
+        '_L_',      num2str(L), ...
+        '_H_',      num2str(H), ...
+        '_L_g_',    num2str(L_g), ...
+        '_H_g_',    num2str(H_g), ...
+        '_n_cl_',   num2str(n_cl), ...
+        '_n_co_',   num2str(n_co), ...
+        '_sigma_',  num2str(sigma), ...
+        '_dn_',     num2str(dn), ...
+        '_phi_',    num2str(phi_degs(ite)),   ...
+        ];
+    filename    = ['data/tbg_sigma'  model_spec '.mat'];
+    load(filename);
 
-w_th_sqd    = sigmass.^2 * w_0^2 ./ (sigmass.^2 + w_0^2) ./ sin(2*theta)^2;
-alpha_ana   = pi^2 * sqrt(2*pi) * w_th_sqd * kappa.^2 / w_0 / Lam^2; 
-alpha_ana   = alpha_ana * sin(phi) / (4*cos(theta)^4);
-alpha_ana   = alpha_ana .* exp(-.5*w_th_sqd .* (2*beta*cos(theta)^2 - K).^2);
+    % common parameters
+    phi     = phi_degs(ite)*pi/180;
+    Lam     = lam/(n_cl * cos(phi) + n_eff);
+    K       = 2 * pi./Lam;
+    theta   = .5*acos(lam/n_eff/Lam - 1);
 
-sigs_ana        = sigmass;
-sigs_num        = sigmas;
-refl_sig_ana    = 100*(1 - 10.^(-alpha_ana*80/log(10)));
-refl_sig_num    = 100*(1 - power_out_sig);
+    % 1 dn_g efficiency studies
+    sigmass = linspace(0, 6, grid_size);
+    kappa   = dn_g/n_eff;
+    beta    = 2 * pi * n_eff/lam;
+
+    w_th_sqd    = sigmass.^2 * w_0^2 ./ (sigmass.^2 + w_0^2) ./ sin(2*theta)^2;
+    alpha_ana   = pi^2 * sqrt(2*pi) * w_th_sqd * kappa.^2 / w_0 / Lam^2; 
+    alpha_ana   = alpha_ana * sin(phi) / (4*cos(theta)^4);
+    alpha_ana   = alpha_ana .* exp(-.5*w_th_sqd .* (2*beta*cos(theta)^2 - K).^2);
+
+    sigs_ana(ite, :)        = sigmass;
+    sigs_num(ite, :)        = sigmas;
+    refl_sig_ana(ite, :)    = 100*(1 - 10.^(-alpha_ana*80/log(10)));
+    refl_sig_num(ite, :)    = 100*(1 - power_out_sig);
+end
 
 %% Figures
 figure(1); clf;
@@ -72,10 +79,34 @@ ylabel('relative squred error');
 
 figure(4); clf;
 plot(...
-    sigs_ana, refl_sig_ana, '-', ...
-    sigs_num, refl_sig_num, 'x')
+    sigs_ana(1, :), refl_sig_ana(1, :), '-', ...
+    sigs_ana(2, :), refl_sig_ana(2, :), '-', ...
+    sigs_ana(3, :), refl_sig_ana(3, :), '--', ...
+    sigs_num(1, :), refl_sig_num(1, :), 'x', ...
+    sigs_num(2, :), refl_sig_num(2, :), '+', ...
+    sigs_num(3, :), refl_sig_num(3, :), 'o')
 xlabel('sigma, {\sigma} / [um]');
 ylabel('Reflectance / [%]');
+colororder(["#8040E6";"#1AA640";"#E68000"])
+legend(...
+    '60^\circ', '90^\circ', '120^\circ', ...
+    '60^\circ', '90^\circ', '120^\circ', 'Location', 'northwest');
+
+%% Figure for the paper
+% figure 5: o(sig^2 w0 / (w0^2 + sig^2) )
+% figure 6: o(1/n_eff^2)
+
+% ord_w0 = sigmas.^2.*w_0s./(sigmas.^2 + w_0s.^2);
+% figure(5); clf;
+% plot(sigmas, ord_w0, 'x-')
+% xlabel('sigma, {\sigma} / [um]');
+% ylabel('o(\sigma^2 w_0/(\sigma^2 + w_0^2) / [1/um]');
+% 
+% ord_n_eff = 1./n_effs.^2;
+% figure(6); clf;
+% plot(sigmas, ord_n_eff, 'x-')
+% xlabel('sigma, {\sigma} / [um]');
+% ylabel('o(1/n_{eff}^2)');
 
 %% write .mat
 % save('dataset_3ab.mat', ...

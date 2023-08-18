@@ -1,4 +1,6 @@
 %% Compute the width of the guide mode
+% This is needed to set the w0 inside the COMSOL. May need to save the
+% COMSOL file manually since saving in the script sometimes doesn't work.
 
 % Run Comsol
 model = mphload('grating_design_arbitrary_v5.3.mph');

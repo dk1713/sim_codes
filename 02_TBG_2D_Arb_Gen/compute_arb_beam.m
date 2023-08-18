@@ -1,4 +1,13 @@
 %% Design and test an arbitrary beam generation
+% This script allows to generate a multiple of super Gaussians focussed
+% onto defined target location. Since the tilt angle need to be constant
+% (limitation of fabrication) it finds the average phi from multiple spots.
+% NB: Since the bandwidth for tilt angle is quite narrow, we may need to
+% put the spots as close as possible or focus at a larger distance.
+%
+% After generating the required grating period and dng, it will put it into
+% comsol to test.
+
 % Indices [1]
 n_air   = 1;
 n_clad  = 1.4555;
@@ -12,52 +21,39 @@ h_core  = 5e-6;
 
 % Parameters of the Gaussians
 % Positions of the Gaussian addressing [m]
-d       = 100 * 1e-6;
-r_1     = [-30*1e-6, d];
-r_2     = [-30*1e-6, d];
+d       = 100e-6;
+r_xs    = [-5e-6, 0, 5e-6] + 25e-6;
 % Common features of the Gaussians
-w       = 10e-6;
-n       = 10;
+w       = 2e-6;
+n       = 1;
 lambda  = 780e-9;
 outP    = 0.2;
-% Features on the grating
-w_g     = 10e-6;
 
 % wavenumbers
 k0      = 2*pi*n_air/lambda;
-k0_clad = 2*pi*n_clad/lambda;
-k0_core = 2*pi*n_core/lambda;
+k_clad  = 2*pi*n_clad/lambda;
+k_core  = 2*pi*n_core/lambda;
 
 %% Define beam in target plane
 % tilt angle of Gaussians (0 rad = vertical)
-phis    = atan([r_1(1)/(r_1(2) + h_clad + h_core/2),    ...
-                r_2(1)/(r_2(2) + h_clad + h_core/2)]);
+phis    = atan(r_xs./d);
 
-% Calculate the new phi's
-r_xs    = [r_1(1), r_2(1)];
-r_dist  = [0, 0];
-while and(mean(abs((r_xs - r_dist)./r_xs)) > 1e-6, abs(r_xs) > abs(r_dist))
-    phis    = phis*(1 + 1e-6);
-    phi2    = asin(n_air*sin(phis)/n_clad);
-    phi3    = asin(n_clad*sin(phi2)/n_core);
-    r_dist  = .5*h_core*tan(phi3) + h_clad*tan(phi2) + d*tan(phis);
-end
+% Calculate theta for the grating design
+theta = .5*(mean(phis) + pi/2);
 
 % defining the range for the grating where .mph file as grating length of
 % 100 um, so  x_max - x_min need to be larger.
 x_min   = -100e-6;
 x_max   = 100e-6;
-x       = linspace(x_min, x_max, 2^11)';
+x       = linspace(x_min, x_max, 2^12)';
 x_ori   = x;
 
 %% Arbitrary field on target location
 gaussian_air = @(x, phi, x_tar, w_0, n) ...
     exp(-1i * k0 * (  sin(phi)*x  )) .* exp(-( (x-x_tar)/w_0 ).^( 2*n ));
 
-num_add     = 1;
-x_tar       = zeros(1, num_add);
-x_tar(1)    = r_1(1);
-x_tar(2)    = r_2(1);
+num_add     = length(r_xs);
+x_tar       = r_xs;
 
 Ez_ori  = 0;
 for ii = 1:num_add
@@ -66,9 +62,12 @@ end
 
 Ek_tar  = fftshift( fft( fftshift(Ez_ori) ) );
 %% Checking the multi-addressing Gaussians
-figure(1)
+figure(1); clf;
 plot(x, abs(Ez_ori))
 xlabel('x')
+for ite = 1:length(x_tar)
+    xline(x_tar(ite));
+end
 ylim([0 1.1])
 ylabel('|E|')
 title('Field on target')
@@ -76,8 +75,8 @@ title('Field on target')
 %% Propagation onto the grating plane
 k       = linspace(-pi, pi, length(x) )'./(x(1) - x(2));
 ky_air  = real( sqrt(k0^2 - k.^2) );
-ky_clad = real( sqrt(k0_clad^2 - k.^2) );
-ky_core = real( sqrt(k0_core^2 - k.^2) );
+ky_clad = real( sqrt(k_clad^2 - k.^2) );
+ky_core = real( sqrt(k_core^2 - k.^2) );
 
 phase_air   = asin(k/(n_air*k0));
 phase_clad  = asin(k/(n_clad*k0));
@@ -91,7 +90,7 @@ Ek_grat = exp(-1i*ky_core*-h_core/2).*Ek_grat;
 
 Ez_grat  = fftshift(  ifft( fftshift(Ek_grat) )  );
 
-figure(2)
+figure(2); clf;
 plot(x, abs(Ez_grat))
 xline(-50e-6)
 xline(50e-6)
@@ -102,7 +101,7 @@ title('Field on grating')
 %% Parameters for grating
 % Remove phase from the tilt
 % psi     = asin(n_clad*asin(phi/n_clad)/n_core);
-Ez_grat = exp(1i*k0_clad*sin(mean(phis))*x) .* Ez_grat;
+Ez_grat = exp(1i*k_clad*sin(mean(phis))*x) .* Ez_grat;
 
 Pz_amp  = abs(Ez_grat).^2;
 phase   = unwrap(angle(Ez_grat)); %add 'unwrap' for smoother interpolation!
@@ -121,7 +120,7 @@ end
 dng_amp = sqrt(outP * C * fun(x) ./ denu);
 
 %%
-figure(3)
+figure(3); clf;
 plot(x, phase)
 xlabel('x')
 ylabel('phase')
@@ -129,7 +128,7 @@ title('desired phase on the grating')
 xline(-50e-6)
 xline(50e-6)
 
-figure(4)
+figure(4); clf;
 plot(x, dng_amp)
 xlabel('x')
 ylabel('grating strength')
@@ -180,10 +179,10 @@ yy      = [.5*L*ones(size(y)); y];
 Px      = mphinterp(model, 'ewfd.Poavx',  'coord', yy);
 p1      = trapz(y, Px);
 
-pow_out = 100*(p0 - p1)/p0;
+pow_out = p1/p0;
 
 %%
-figure(5);
+figure(5); clf;
 plot(x, abs(Ez));
 xline(-L_g/2)
 xline(L_g/2)
@@ -191,13 +190,13 @@ xlabel('x')
 ylabel('|E|')
 title('Field on measurement line')
 
-% save([  'data/grating_design',     ...
+% save([  'data/grating_design',                                  ...
 %         '_dimensions_',         num2str(H), 'x', num2str(L),    ...
 %         '_grat_length_',        num2str(L_g),                   ...
 %         '_lambda_',             num2str(lam),                   ...
 %         '_n_clad_',             num2str(n_clad),                ...
 %         '_dn_',                 num2str(dn),                    ...
-%         '_target_dist_',        num2str(d*1e6),                     ...
+%         '_target_dist_',        num2str(d*1e6),                 ...
 %         '_target_x1_',          num2str(r_1(1)*1e6),            ...
 %         '_target_x2_',          num2str(r_2(1)*1e6),            ...
 %         '_target_waist_',       num2str(w*1e6),                 ...
