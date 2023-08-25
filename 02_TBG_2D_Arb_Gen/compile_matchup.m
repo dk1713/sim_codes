@@ -13,9 +13,11 @@ h_core  = 5e-6;
 
 % Target distance and beam waist
 lam     = 780e-9;
-r       = [-3, 3];
-d       = 100;
-w_0     = 2;
+% r       = 40;
+% r       = [-5, 5];
+r       = [-20, 20];
+d       = 50;
+w_0     = 3;
 n       = 1;
 outP    = 0.2;
 
@@ -26,20 +28,26 @@ L       = 120;
 H       = 30;
 L_g     = 100;
 
+% tar_xs string generator
+newStr = num2str(r(1));
+for ite = 2:length(r)
+    newStr = [newStr 'x' num2str(r(ite))]; %#ok<AGROW>
+end
+
 load([  'data/grating_design',                                  ...
-        '_dimensions_',         num2str(H), 'x', num2str(L),    ...
-        '_grat_length_',        num2str(L_g),                   ...
+        '_dim_',                num2str(H), 'x', num2str(L),    ...
+        '_grat_len_',           num2str(L_g),                   ...
         '_lambda_',             num2str(lam * 1e6),             ...
         '_n_clad_',             num2str(n_clad),                ...
         '_dn_',                 num2str(dn),                    ...
-        '_target_dist_',        num2str(d),                     ...
-        '_target_x1_',          num2str(r(1)),                  ...
-        '_target_x2_',          num2str(r(2)),                  ...
-        '_target_waist_',       num2str(w_0),                   ...
-        '_gausssian_order_',    num2str(n),                     ...
-        '_power_ratio_',        num2str(outP),                  ...
+        '_tar_dist_',           num2str(d),                     ...
+        '_tar_xs_',             newStr,                         ...
+        '_tar_waist_',          num2str(w_0),                   ...
+        '_gauss_order_',        num2str(n),                     ...
+        '_eta_',                num2str(outP),                  ...
         '.mat']);
-
+% disp(max(dng_amp));
+disp(max(dng_need));
 %% Initialisation
 x       = x * 1e-6;
 k0      = 2*pi * n_air / lam;
@@ -79,14 +87,14 @@ Ez_fil2  = zeros(N2,1);
 Ez_fil2(.5*(N2-N) + (0:N-1)) = E_fil;
 Ek_fil2 = fftshift( fft( fftshift(Ez_fil2) ) );
 %% Electric field in real and fourier spaces
-figure(11)
+figure(11); clf;
 plot(   x,  abs(Ez),        'b', ...
         x2, abs(Ez_fil2),   '--r' )
 xlabel('x')
 ylabel('|E|')
 legend('original', 'filtered')
 
-figure(12)
+figure(12); clf;
 plot(   k,  abs(Ek),        'b', ...
         k2, abs(Ek_fil2),   '--r')
 xlabel('k')
@@ -128,7 +136,7 @@ Ek_pro  = [Ek_pro Ek_pro3];
 Ez_pro  = fftshift(  ifft( fftshift(Ek_pro,1) ),1  );
 
 %% Checking if original matches simulated
-figure(13)
+figure(13); clf;
 plot(   x2*1e6,     abs(Ez_tar/max(Ez_tar)),    'r',    ...
         x_ori*1e6,  abs(Ez_ori/max(Ez_ori)),    '--b',  ...
         x*1e6,      abs(Ez/max(Ez)),            '-.k')
@@ -138,7 +146,7 @@ ylim([0 1.1])
 xlim([-60 60])
 legend('Simulated', 'Desired Shape', 'Above Grating', 'Location', 'northeast')
 %%
-figure(14)
+figure(14); clf;
 pcolor(x2*1e6, [y+y_shift y2+h*1e-6 y3+(h+d)*1e-6]*1e6, abs(Ez_pro)');
 shading interp
 
@@ -163,7 +171,7 @@ yline(.5*h_core*1e6,'k','LineWidth', 2, 'HandleVisibility','off')
 y_new   = [y+y_shift y2+h*1e-6 y3+(h+d)*1e-6]*1e6;
 y_max   = y_new(end) - y_new(1) + y0(end) - y0(1);
 
-figure(16)
+figure(16); clf;
 ax1  = axes;
 pl1  = pcolor(x2*1e6, y_new, abs(Ez_pro)');
 shading interp

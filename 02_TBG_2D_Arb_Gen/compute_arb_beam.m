@@ -13,7 +13,6 @@ n_air   = 1;
 n_clad  = 1.4555;
 n_core  = 1.4608;
 n_eff   = 1.4635;
-dn_g    = 5e-3;
 
 % Heights of the layers [m]
 h_clad  = 15e-6;
@@ -21,10 +20,13 @@ h_core  = 5e-6;
 
 % Parameters of the Gaussians
 % Positions of the Gaussian addressing [m]
-d       = 100e-6;
-r_xs    = [-5e-6, 0, 5e-6] + 25e-6;
+d       = 50e-6;
+% r_xs    = 0e-6;
+% r_xs    = [-5e-6, 5e-6] + 25e-6;
+r_xs    = [-20e-6, 20e-6];
+% r_xs    = [0, 30e-6];
 % Common features of the Gaussians
-w       = 2e-6;
+w       = 3e-6;
 n       = 1;
 lambda  = 780e-9;
 outP    = 0.2;
@@ -37,9 +39,10 @@ k_core  = 2*pi*n_core/lambda;
 %% Define beam in target plane
 % tilt angle of Gaussians (0 rad = vertical)
 phis    = atan(r_xs./d);
+% Calculate mean phis for the grating design
+phi     = mean(phis) + pi/2;
+% NB: theta is caculated in the COMSOL file.
 
-% Calculate theta for the grating design
-theta = .5*(mean(phis) + pi/2);
 
 % defining the range for the grating where .mph file as grating length of
 % 100 um, so  x_max - x_min need to be larger.
@@ -53,11 +56,10 @@ gaussian_air = @(x, phi, x_tar, w_0, n) ...
     exp(-1i * k0 * (  sin(phi)*x  )) .* exp(-( (x-x_tar)/w_0 ).^( 2*n ));
 
 num_add     = length(r_xs);
-x_tar       = r_xs;
-
 Ez_ori  = 0;
+
 for ii = 1:num_add
-    Ez_ori = Ez_ori + gaussian_air(x, phis(ii), x_tar(ii), w, n);
+    Ez_ori = Ez_ori + gaussian_air(x, phis(ii), r_xs(ii), w, n);
 end
 
 Ek_tar  = fftshift( fft( fftshift(Ez_ori) ) );
@@ -65,8 +67,8 @@ Ek_tar  = fftshift( fft( fftshift(Ez_ori) ) );
 figure(1); clf;
 plot(x, abs(Ez_ori))
 xlabel('x')
-for ite = 1:length(x_tar)
-    xline(x_tar(ite));
+for ite = 1:length(r_xs)
+    xline(r_xs(ite));
 end
 ylim([0 1.1])
 ylabel('|E|')
@@ -138,10 +140,11 @@ xline(50e-6)
 
 save('phase.mat',       'x',  'phase');
 save('dng_amp.mat',     'x',  'dng_amp');
+dng_need = dng_amp/max(dng_amp);
 
 %% Run Comsol
 model = mphload('grating_design_arbitrary_v5.3.mph');
-model.param('par2').set('phi', [num2str(90 + mean(phis)*180/pi), ' [deg]']);
+model.param('par2').set('phi', [num2str(phi*180/pi), ' [deg]']);
 model.study('std1').run
 
 % Dimensions
@@ -153,6 +156,7 @@ lam     = mphglobal(model, 'lambda0');
 n_clad  = mphglobal(model, 'n_cl');
 dn      = mphglobal(model, 'dn');
 
+% Taking Ez from the measurement line.
 x       = linspace(-.5*L, .5*L, 5000);
 xx      = [x; (.5*H - 3)*ones(size(x))];
 Ez      = mphinterp(model, 'ewfd.Ez',     'coord', xx);
@@ -179,7 +183,8 @@ yy      = [.5*L*ones(size(y)); y];
 Px      = mphinterp(model, 'ewfd.Poavx',  'coord', yy);
 p1      = trapz(y, Px);
 
-pow_out = p1/p0;
+pow_out     = p1/p0;
+dng_need    = dng_need * max_dng;
 
 %%
 figure(5); clf;
@@ -190,17 +195,23 @@ xlabel('x')
 ylabel('|E|')
 title('Field on measurement line')
 
-% save([  'data/grating_design',                                  ...
-%         '_dimensions_',         num2str(H), 'x', num2str(L),    ...
-%         '_grat_length_',        num2str(L_g),                   ...
-%         '_lambda_',             num2str(lam),                   ...
-%         '_n_clad_',             num2str(n_clad),                ...
-%         '_dn_',                 num2str(dn),                    ...
-%         '_target_dist_',        num2str(d*1e6),                 ...
-%         '_target_x1_',          num2str(r_1(1)*1e6),            ...
-%         '_target_x2_',          num2str(r_2(1)*1e6),            ...
-%         '_target_waist_',       num2str(w*1e6),                 ...
-%         '_gausssian_order_',    num2str(n),                     ...
-%         '_power_ratio_',        num2str(outP),                  ...
-%         '.mat'],    'x', 'x_ori', 'Ez', 'Ez_ori', 'pow_out', 'max_dng', ...
-%                     'x0', 'y0', 'Ez_wg');
+newStr = num2str(r_xs(1)*1e6);
+for ite = 2:length(r_xs)
+    newStr = [newStr 'x' num2str(r_xs(ite)*1e6)]; %#ok<AGROW>
+end
+
+save([  'data/grating_design',                              ...
+        '_dim_',            num2str(H), 'x', num2str(L),    ...
+        '_grat_len_',       num2str(L_g),                   ...
+        '_lambda_',         num2str(lam),                   ...
+        '_n_clad_',         num2str(n_clad),                ...
+        '_dn_',             num2str(dn),                    ...
+        '_tar_dist_',       num2str(d*1e6),                 ...
+        '_tar_xs_',         newStr,                         ...
+        '_tar_waist_',      num2str(w*1e6),                 ...
+        '_gauss_order_',    num2str(n),                     ...
+        '_eta_',            num2str(outP), '.mat'],         ...
+        'x_ori', 'Ez_ori', 'phase', 'dng_need', ... % from analytic
+        'x', 'Ez', 'dng_amp',      ...  % from comsol: measurement line
+        'pow_out',  ...  % efficiency
+        'x0', 'y0', 'Ez_wg'); % This is picture of grating profile.
