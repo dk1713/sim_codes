@@ -21,13 +21,13 @@ h_core  = 5e-6;
 % Parameters of the Gaussians
 % Positions of the Gaussian addressing [m]
 d       = 50e-6;
-% r_xs    = 0e-6;
-% r_xs    = [-5e-6, 5e-6] + 25e-6;
-r_xs    = [-20e-6, 20e-6];
+r_xs    = 0e-6;
+% r_xs    = [-5e-6, 5e-6] + 0e-6;
+% r_xs    = [-20e-6, 20e-6];
 % r_xs    = [0, 30e-6];
 % Common features of the Gaussians
-w       = 3e-6;
-n       = 1;
+w       = 10e-6;
+n       = 10;
 lambda  = 780e-9;
 outP    = 0.2;
 
@@ -61,6 +61,14 @@ Ez_ori  = 0;
 for ii = 1:num_add
     Ez_ori = Ez_ori + gaussian_air(x, phis(ii), r_xs(ii), w, n);
 end
+
+% factor = 1;
+% for ii = 1:num_add
+%     if ii == 2
+%         factor = .5;
+%     end
+%     Ez_ori = Ez_ori + gaussian_air(x, phis(ii), r_xs(ii), w, n)*factor;
+% end
 
 Ek_tar  = fftshift( fft( fftshift(Ez_ori) ) );
 %% Checking the multi-addressing Gaussians

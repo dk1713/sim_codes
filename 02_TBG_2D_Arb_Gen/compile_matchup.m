@@ -10,15 +10,15 @@ dn      = 5e-3;
 % Heights of the layers [m]
 h_clad  = 15e-6;
 h_core  = 5e-6;
-
-% Target distance and beam waist
 lam     = 780e-9;
-% r       = 40;
+
+% Target distance and beam waist [um]
+r       = 0;
 % r       = [-5, 5];
-r       = [-20, 20];
+% r       = [-20, 20];
 d       = 50;
-w_0     = 3;
-n       = 1;
+w_0     = 10;
+n       = 10;
 outP    = 0.2;
 
 h       = (h_clad + .5*h_core)*1e6;
@@ -144,7 +144,7 @@ xlabel('x/ {\mu}m')
 ylabel('Normalised |E|')
 ylim([0 1.1])
 xlim([-60 60])
-legend('Simulated', 'Desired Shape', 'Above Grating', 'Location', 'northeast')
+legend('Simulated', 'Desired Shape', 'Above Grating', 'Location', 'northwest')
 %%
 figure(14); clf;
 pcolor(x2*1e6, [y+y_shift y2+h*1e-6 y3+(h+d)*1e-6]*1e6, abs(Ez_pro)');
