@@ -6,7 +6,7 @@ n_air   = 1;
 n_clad  = 1.4555;
 n_core  = 1.4608;
 n_eff   = 1.4635;
-dn_g    = 1e-3;
+dn_g    = 3e-3;
 
 % Heights of the layers [m]
 h_clad  = 15e-6;
@@ -14,7 +14,7 @@ h_core  = 5e-6;
 
 %% Target specification
 lam     = 780e-9;
-n       = 10;
+n       = 1;
 
 % distance from the top of the chip.
 dist    = 8e-3;
@@ -86,8 +86,8 @@ for iter = 1:length(phis)
     % limit that depends on pump depletion and limiting to dn_g < 5e-3
 
     % init
-    eta     = .01; % 1e-3
-%     eta     = .1; % 3e-3
+%     eta     = .01; % 1e-3
+    eta     = .1; % 3e-3
     F       = griddedInterpolant(x, Pz_amp, 'spline');
     fun     = @(x) F(x);
     C       = 1/integral(fun, min(x), max(x));

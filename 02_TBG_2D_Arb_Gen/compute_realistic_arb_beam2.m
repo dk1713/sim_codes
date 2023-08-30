@@ -18,7 +18,7 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % distance from the top of the glass.
-dist    = 5e-3;
+dist    = 2e-3;
 
 %% Specification for environments
 % Wavenumbers
