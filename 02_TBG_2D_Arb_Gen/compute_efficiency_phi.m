@@ -160,12 +160,6 @@ end
 save(   ['efficiency_' type '.mat'], ...
         'x3',  's3');
 %%
-s3 = real(s3);
-save(   ['efficiency_' type '.mat'], ...
-        'x3',  's3');
-%%
-% figure(3)
-% plot(x2 + 90, s2, 'r', x3 + 90, s3, 'b')
-% xlabel('scattering angle, \phi / [deg]')
-% ylabel('reflectance efficiencies [%]')
-% legend('Gaussian', 'super-Gaussian')
+% s3 = real(s3);
+% save(   ['efficiency_' type '.mat'], ...
+%         'x3',  's3');

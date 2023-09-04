@@ -1,6 +1,8 @@
 %% Efficiency of an atom trap by beam tracing method
 % Refer to the beam tracing method of derivation of the analytic solution.
-% By using the mentioned solution, the efficiency is estimated.
+% By using the mentioned solution, the efficiency is estimated. Make sure
+% to use compute_realistic_check.m first to check if you are working in the
+% correct domain or the light doesn't go over the domain.
 
 %% Device specification
 % Indices [1]

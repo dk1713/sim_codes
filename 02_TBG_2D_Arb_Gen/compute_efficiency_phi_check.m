@@ -1,6 +1,8 @@
-%% Efficiency of an atom trap by beam tracing method
-% Refer to the beam tracing method of derivation of the analytic solution.
-% By using the mentioned solution, the efficiency is estimated.
+%% Checking for correct beam generation.
+% This script checks for compute_realistic_arb_beam.m such that the
+% targeted beam remain in the defined domain. There are other methods to
+% ensure this to happen but this is the quickest way. Also needed to see
+% the images of the beam at the target plane and grating plane.
 
 %% Device specification
 % Indices [1]
