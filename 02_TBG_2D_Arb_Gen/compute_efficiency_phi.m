@@ -17,7 +17,7 @@ lam     = 780e-9;
 n       = 1;
 
 % distance from the top of the chip.
-dist    = 8e-3;
+dist    = 5e-3;
 % estimated focussed area
 waist   = 30e-6;
 L_x     = 10e-3;

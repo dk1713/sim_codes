@@ -14,12 +14,12 @@ h_core  = 5e-6;
 
 %% Target specification
 lam     = 780e-9;
-n       = 1;
+n       = 10;
 
 % distance from the top of the chip.
 dist    = 8e-3;
 % estimated focussed area
-waist   = 30e-6;
+waist   = 10e-6;
 L_x     = 10e-3;
 % Define grid points 
 x = linspace(-.5*L_x, .5*L_x, 2^14)';
@@ -83,7 +83,7 @@ Pz_amp  = abs(E_grat).^2;
 
 % init
 %     eta     = .01; % 1e-3
-eta     = .1; % 3e-3
+eta     = .2; % 3e-3
 F       = griddedInterpolant(x, Pz_amp, 'spline');
 fun     = @(x) F(x);
 C       = 1/integral(fun, min(x), max(x));
@@ -117,7 +117,7 @@ while 1e3*abs(dng_diff) > 1e-4
     max_dng = max(dn_gs);
     dng_diff = dn_g - max_dng;
 
-    eta = eta + 5*dng_diff;
+    eta = eta + 100*dng_diff;
     fprintf('showing max dng = %2.4e \n', max(dn_gs));
 end
 %% efficiency
@@ -129,8 +129,25 @@ alpha_ana   = alpha_ana .* sin(psi) / (4*cos(theta)^4);
 alpha_ana   = alpha_ana .* exp(-.5*w_th_sqd .* (2*beta*cos(theta)^2 - K).^2);
 
 efficiency  = real(100 - 100*exp(-trapz(x, alpha_ana)));
-%%
+fprintf('power efficiency    = %2.4e [dB] \n', trapz(x, 10*alpha_ana/log(10)));
+fprintf('power scattered out = %2.1f [%%] \n', 100 - 100*10^(-.1*trapz(x, 10*alpha_ana/log(10))));
+fprintf('power scattered out = %2.1f [%%] \n', efficiency);
 
+%% final figures
+figure(5); clf;
+plot(1e3*x, 1e9*period)
+yline(1e9*lam/(1*cos(phi+.5*pi) + n_eff), '--k', 'constant k');
+xlabel('x / [mm]')
+ylabel('grating period / [nm]')
+% xlim([-1.2 1.2])
+title('desired grating period')
+
+figure(6); clf;
+plot(1e3*x, dn_gs);
+xlabel('x / [mm]')
+ylabel('grating strength')
+% xlim([-1.2 1.2])
+title('desired grating strength')
 
 %
 if n == 1
@@ -139,5 +156,6 @@ else
     type = 'super';
 end
 
-% save(   ['profile_' type '.mat'], ...
-%         'x3',  's3');
+% Required .mat files
+save(   ['realistic_' type '.mat'], ...
+        'x',  'period', 'dn_gs', 'efficiency');

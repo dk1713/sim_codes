@@ -20,7 +20,7 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % distance from the top of the glass.
-dist    = 2e-3;
+dist    = 5e-3;
 
 %% Specification for environments
 % Wavenumbers
@@ -35,7 +35,7 @@ L_x     = 10e-3;
 phi     = 30*pi/180;
 x_tar   = [dist*tan(phi), -dist];
 waist   = 30e-6;
-n = 1;
+n = 10;
 
 gaussian = @(x, phi, x_tar, w, n) ...
         exp(-1i * k0 * (  sin(phi)*x  )) .* exp(-( (x-x_tar(1))/w ).^( 2*n ));
@@ -43,18 +43,15 @@ gaussian = @(x, phi, x_tar, w, n) ...
 
 % Gaussian beam on the surface of the glass
 x      = linspace(-.5*L_x, .5*L_x, 2^14)';
-E_tar      = gaussian(x, phi, x_tar(1), waist, n);
+E_tar  = gaussian(x, phi, x_tar(1), waist, n);
 %%
 % checking the shape
-figure(5)
+figure(10)
 plot(x*1e3, abs(E_tar))
-xline(x_tar(1))
-% xline(0, '--r');
-% xline(-len_g*.5e3, '--k');
-% xline(len_g*.5e3, '--k');
-% xlim(1e3*[-len_g, len_g])
+xline(x_tar(1)*1e3, '--r')
 xlabel('x / [mm]')
 ylabel('|E|')
+xlim(x_tar(1)*1e3 + [-waist, waist]*1e3*exp(1));
 title('Field on target')
 
 %% Propagation onto the grating plane
@@ -68,7 +65,7 @@ k       = linspace(-pi, pi, length(x) )'./(x(2) - x(1));
 % wavenumbers, k's.
 
 k_cen   = k0*sin(phi);
-E_tar       = E_tar .* exp(1i*k_cen*x);
+E_tar   = E_tar .* exp(1i*k_cen*x);
 
 %%
 fprintf('--------------------------------------------------------------\n')
@@ -98,11 +95,9 @@ Ek_grat = exp(-1i*ky_core*-h_core/2).*Ek_grat;
 E_grat_shifted  = fftshift(  ifft( fftshift(Ek_grat) )  );
 E_grat  = E_grat_shifted .* exp(-1i*k_cen*x);
 
-figure(6)
+figure(11)
 plot(x*1e3, abs(E_grat))
 xline(0, '--r');
-xline(5)
 xlabel('x / [mm]')
 ylabel('|E|')
 title('Field on grating')
-% xlim([-5,-3])
