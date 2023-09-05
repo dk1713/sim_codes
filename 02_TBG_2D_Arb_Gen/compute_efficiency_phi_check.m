@@ -34,7 +34,7 @@ L_x     = 10e-3;
 
 phi     = 30*pi/180;
 x_tar   = [dist*tan(phi), -dist];
-waist   = 30e-6;
+waist   = 10e-6;
 n = 10;
 
 gaussian = @(x, phi, x_tar, w, n) ...

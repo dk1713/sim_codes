@@ -14,12 +14,12 @@ h_core  = 5e-6;
 
 %% Target specification
 lam     = 780e-9;
-n       = 1;
+n       = 10;
 
 % distance from the top of the chip.
-dist    = 5e-3;
+dist    = 8e-3;
 % estimated focussed area
-waist   = 30e-6;
+waist   = 10e-6;
 L_x     = 10e-3;
 % Define grid points 
 x = linspace(-.5*L_x, .5*L_x, 2^14)';
@@ -87,7 +87,7 @@ for iter = 1:length(phis)
 
     % init
 %     eta     = .01; % 1e-3
-    eta     = .1; % 3e-3
+    eta     = .25; % 3e-3
     F       = griddedInterpolant(x, Pz_amp, 'spline');
     fun     = @(x) F(x);
     C       = 1/integral(fun, min(x), max(x));
@@ -121,7 +121,7 @@ for iter = 1:length(phis)
         max_dng = max(dn_gs);
         dng_diff = dn_g - max_dng;
 
-        eta = eta + 5*dng_diff;
+        eta = eta + 10*dng_diff;
         fprintf('showing max dng = %2.4e \n', max(dn_gs));
     end
     %% efficiency
@@ -137,16 +137,16 @@ end
 %%
 phi_deg = 180*phis/pi;
 
-figure(1)
+figure(1); clf;
 plot(phi_deg, efficiencies)
 xlabel('scattering angle, \phi / [deg]')
 ylabel('reflectance efficiencies [%]')
 
-x3      = linspace(phi_deg(1), phi_deg(end), 500);
-s3      = spline(phi_deg, efficiencies, x3);
+x = linspace(phi_deg(1), phi_deg(end), 500);
+s = spline(phi_deg, efficiencies, x);
 
-figure(2)
-plot(x3, s3)
+figure(2); clf;
+plot(x, s)
 xlabel('scattering angle, \phi / [deg]')
 ylabel('reflectance efficiencies [%]')
 
@@ -158,7 +158,7 @@ else
 end
 
 save(   ['efficiency_' type '.mat'], ...
-        'x3',  's3');
+        'x',  's');
 %%
 % s3 = real(s3);
 % save(   ['efficiency_' type '.mat'], ...

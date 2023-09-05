@@ -117,7 +117,7 @@ while 1e3*abs(dng_diff) > 1e-4
     max_dng = max(dn_gs);
     dng_diff = dn_g - max_dng;
 
-    eta = eta + 100*dng_diff;
+    eta = eta + 10*dng_diff;
     fprintf('showing max dng = %2.4e \n', max(dn_gs));
 end
 %% efficiency
@@ -150,12 +150,12 @@ ylabel('grating strength')
 title('desired grating strength')
 
 %
-if n == 1
-    type = 'gauss';
-else
-    type = 'super';
-end
-
-% Required .mat files
-save(   ['realistic_' type '.mat'], ...
-        'x',  'period', 'dn_gs', 'efficiency');
+% if n == 1
+%     type = 'gauss';
+% else
+%     type = 'super';
+% end
+% 
+% % Required .mat files
+% save(   ['realistic_' type '.mat'], ...
+%         'x',  'period', 'dn_gs', 'efficiency');
