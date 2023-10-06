@@ -9,9 +9,9 @@ k0 = 2*pi/lam;
 yzv = [0 0.2 0.4]*1e-6;   % for loop of y or z (cross sections at different positions)
 nyzv = length(yzv);
 
-for iyzv=1:nyzv
+for iyzv=1:1%nyzv
 
-if (1==1)   % vertical cross section at y=const
+if (1==0)   % vertical cross section at y=const
     plotsel = 1;
     xv = (-20:0.05:20)*1e-6;
     yv = yzv(iyzv);     %0;     %(-4:0.05:4)*1e-6;
@@ -118,6 +118,7 @@ else
 end
 shading flat
 axis equal
+colorbar;
 
 % interference term only
 
@@ -130,10 +131,6 @@ if plotsel==1
     title(['interference, |E1+E2|^2-|E1|^2-|E2|^2, y=' num2str(yv)])
 else
     pcolor(xv,yv,squeeze(Et2))    
-    % pcolor(xv,yv,(abs(squeeze(Et)).^2-abs(squeeze(E1)).^2-abs(squeeze(E2)).^2)./abs(squeeze(E1)).^2)    
-    %   note on above:  this is meant to be ~dng, but shouldn't be
-    %                   normalised to pump field at z, only to the pump at centre of
-    %                   waveguide, or power integrated over z
     xlabel('x'), ylabel('y')
     title(['interference, |E1+E2|^2-|E1|^2-|E2|^2, z=' num2str(zv)])
 end
