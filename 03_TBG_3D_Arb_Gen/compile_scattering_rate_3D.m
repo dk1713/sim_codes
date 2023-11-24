@@ -17,7 +17,7 @@
 
 %% Parameters
 % wavelength
-lam     = 1.55e-6; 780e-9;
+lam     = 780e-9;
 k0      = 2*pi/lam;
 c       = 3e8;
 
@@ -30,7 +30,7 @@ w0      = 2e-6;
 % waist of refractive index profile (vertical)
 sig     = 2e-6;
 % grating index contrast
-dn_g    = 1;            
+dn_g    = 3e-3;            
 
 %% Define target beam (scalar), propagate to grating plane
 % grid in grating plane: horizontal cross section at z=0
@@ -41,7 +41,7 @@ y = (-.5*Ly: dy :.5*Ly);
 
 [xx, yy] = meshgrid(x, y);
 
-direction = [-.5, 0, .5];
+direction = [-1, 0, 1];
 theta_inc   = (linspace(-90,90,2^6))*pi/180;
 scattering  = zeros(2,length(theta_inc));
 
@@ -68,4 +68,4 @@ end
 figure(1); clf;
 plot(theta_inc*180/pi, scattering);
 xlabel('rotated angle, \theta_{inc} / [deg]'); ylabel('scattering rate');
-legend('u = (-0.5,0,1)','u = (0,0,1)','u = (0.5,0,1)');
+legend('u = (-1,0,1)','u = (1,0,1)','u = (1,0,1)');

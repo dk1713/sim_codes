@@ -5,7 +5,7 @@ function [E_pump, E_target] = define_fields(varargin)
 % Default values
 lam  = 780e-9; %#ok<NASGU> 
 type = 'gaussian';
-dire = [0, 1, 0];
+dire = [0, 0, 1];
 view = 'horizontal';
 
 switch nargin
@@ -28,37 +28,37 @@ k1      = 2*pi*n_eff/lam;
 
 % define the meshgrid
 if strcmpi(view, 'horizontal') && length(varargin{2}) == 1
-    [xx, zz] = meshgrid(varargin{1}, varargin{3});
-    yy = varargin{2};
+    [xx, yy] = meshgrid(varargin{1}, varargin{3});
+    zz = varargin{2};
 elseif strcmpi(view, 'vertical') && length(varargin{3}) == 1
-    [xx, yy] = meshgrid(varargin{1}, varargin{2});
-    zz = varargin{3};
+    [xx, zz] = meshgrid(varargin{1}, varargin{2});
+    yy = varargin{3};
 else
     disp('Wrong viewpoint input or incorrect dimensions for y/z');
     return;
 end
 
 % define the pump
-k1x = k1; w_y = 2e-6; w_z = 100*5.8e-6;
-E_pump = exp(1i*k1x*xx).*exp(-zz.^2/w_z^2).*exp(-yy.^2/w_y^2);
+k1x = k1; w_y = 3e-6; w_z = 8e-6;
+E_pump = exp(1i*k1x*xx).*exp(-yy.^2/w_z^2).*exp(-zz.^2/w_y^2);
 
 % define the target field
 n   = dire/norm(dire);
 E0  = 0.1; % just amplitude.
 
 if strcmpi(type, 'plane')
-    E_target = E0*exp(1i*k1*(n(1)*xx + n(2)*yy + n(3)*zz));
+    E_target = E0*exp(1i*k1*(n(1)*xx + n(2)*zz + n(3)*yy));
 
 elseif strcmpi(type, 'gaussian') %NB: working in the rotated frame.
     % beam waist
-    w = 2.5e-6; %% ADJUST HERE %%
+    w = 3e-6; %% ADJUST HERE %%
     % distance to target location
     zfoc = 50e-6; %% ADJUST HERE %%
     
     % z in rotated frame = projection onto prop. direction
-    z = xx*n(1) + yy*n(2) + zz*n(3);
+    z = xx*n(1) + zz*n(2) + yy*n(3);
     % x=r in rotated frame = the orth. component to z
-    r = sqrt(xx.^2 + yy.^2 + zz.^2 - z.^2);
+    r = sqrt(xx.^2 + zz.^2 + yy.^2 - z.^2);
     z = z - zfoc;
     
     zR = pi*w^2/lam;

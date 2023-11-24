@@ -12,10 +12,10 @@ global lam c k0 neff beta w0 sigma dng
 
 % parameters
 
-lam = 1.55e-6;780e-9;           % wavelength
+lam = 780e-9;           % wavelength
 k0 = 2*pi/lam;
 
-polout = 4;     % set output polarisation: 1=lin pol 1, 2=lin pol 2, 3=circ pol 1, 4=circ pol 2
+polout = 1;     % set output polarisation: 1=lin pol 1, 2=lin pol 2, 3=circ pol 1, 4=circ pol 2
 
 
 c = 3e8;
@@ -277,37 +277,37 @@ n2crossz = (-1).^(upw2+1).*sqrt(1-n2crossx.^2-n2crossy.^2);
 
 
 
-figure(5)
+figure(5); clf;
 subplot(231)
 pcolor(xx,yy,al1.*dng1.^2), shading flat, colorbar  % |A1|=1 now
-xlabel('x'), ylabel('y'), title('P1: design scatter dng^2\alpha|A|^2')
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(234)
-pcolor(xx,yy,al1cross.*dng2.^2), shading flat, colorbar
-xlabel('x'), ylabel('y'), title('P1: parasitic scatter')
+contour(xx,yy,al1cross.*dng2.^2), shading flat, colorbar
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(232)
 pcolor(xx,yy,al2.*dng2.^2), shading flat, colorbar
-xlabel('x'), ylabel('y'), title('P2: design scatter dng^2\alpha|A|^2')
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(235)
-pcolor(xx,yy,al2cross.*dng1.^2), shading flat, colorbar
-xlabel('x'), ylabel('y'), title('P2: parasitic scatter')
+contour(xx,yy,al2cross.*dng1.^2), shading flat, colorbar
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(233)
 pcolor(xx,yy,al1.*dng1.^2+al2.*dng2.^2), shading flat, colorbar
-xlabel('x'), ylabel('y'), title('P1+P2: design scatter dng^2\alpha|A|^2')
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(236)
-pcolor(xx,yy,al1cross.*dng2.^2+al2cross.*dng1.^2), shading flat, colorbar
-xlabel('x'), ylabel('y'), title('P1+P2: parasitic scatter')
+contour(xx,yy,al1cross.*dng2.^2+al2cross.*dng1.^2), shading flat, colorbar
+xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 
 %% for poster
-figure(6)
-max_dng = max(max(al1.*dng1.^2+al2.*dng2.^2));
-pcolor(xx,yy,(al1.*dng1.^2+al2.*dng2.^2)/max_dng); shading flat; colorbar;
-xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
-a = colorbar;
-ylabel(a,'Intensity/ [a.u.]');
-
-figure(7)
-max_dng = max(max(al1cross.*dng2.^2+al2cross.*dng1.^2));
-pcolor(xx,yy,(al1cross.*dng2.^2+al2cross.*dng1.^2)/max_dng); shading flat; colorbar;
-xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
-a = colorbar;
-ylabel(a,'Intensity/ [a.u.]');
+% figure(6)
+% max_dng = max(max(al1.*dng1.^2+al2.*dng2.^2));
+% pcolor(xx,yy,(al1.*dng1.^2+al2.*dng2.^2)/max_dng); shading flat; colorbar;
+% xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
+% a = colorbar;
+% ylabel(a,'Intensity/ [a.u.]');
+% 
+% figure(7)
+% max_dng = max(max(al1cross.*dng2.^2+al2cross.*dng1.^2));
+% pcolor(xx,yy,(al1cross.*dng2.^2+al2cross.*dng1.^2)/max_dng); shading flat; colorbar;
+% xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
+% a = colorbar;
+% ylabel(a,'Intensity/ [a.u.]');

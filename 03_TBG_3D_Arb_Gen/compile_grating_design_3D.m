@@ -17,7 +17,7 @@
 
 %% Parameters
 % wavelength
-lam     = 1.55e-6; 780e-9;
+lam     = 780e-9;
 k0      = 2*pi/lam;
 c       = 3e8;
 
@@ -25,12 +25,14 @@ c       = 3e8;
 n_eff   = 1.4635;
 % propagation constant of mode
 beta    = k0*n_eff;
-% waist of fundamental mode (vertical)
-w0      = 2e-6;
+% waist of output beam
+w0      = 3e-6;
 % waist of refractive index profile (vertical)
-sig     = 2e-6;
+sig     = 3e-6;
+% focal distance surface to waist
+dist_f  = 50e-6;
 % grating index contrast
-dn_g    = 1;            
+dn_g    = 1;    
 
 %% Define target beam (scalar), propagate to grating plane
 % grid in grating plane: horizontal cross section at z=0
@@ -42,21 +44,21 @@ y = (-.5*Ly: dy :.5*Ly);
 [xx, yy] = meshgrid(x, y);
 
 % direction vector for output beam
-n_out = [0, 1, 1];
+n_out = [-1, -1, 1];
 
 % Set the pump types with case 1, 2, 3:
 %   1. flat pump at input P=1, choose max dng for pump depletion
 %   2. flat pump at input P=1, choose max dng for 50% pump depletion (can
 %   be adjusted if needed. Change the number in 'sqrt')
 %   3. optimised pump at input
-setpump = 2;
+setpump = 3;
 
 %% pump in x (pump 1)
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in x')
 n_in  = [1, 0, 0];
 % not k0 but k = beta
-E1 = define_target_field(xx, yy, beta, n_out, 'gaussian', 2.5e-6, 50e-6);
+E1 = define_target_field(xx, yy, beta, n_out, 'gaussian', w0, dist_f);
 
 % calculate central grating properties (period, rotation, tilt)
 [Lam_grat0_1, alp_grat0_1, alp_tilt0_1] = compute_grating_angles(...
@@ -211,7 +213,7 @@ shading flat; axis equal; colorbar;
 
 %% Computing for grating designs with different types of pump depletion:
 %% For pump in x+ direction. (pump 1)
-loss1 = cumsum(dng1.^2 .* al1,2) * (x(2)-x(1));
+loss1 = cumsum(dng1.^2 .* al1, 2) * (x(2)-x(1));
 
 if (setpump==1)         % case 1
     dngbar_max = sqrt(1/max(loss1(:,end)));
@@ -228,7 +230,7 @@ elseif (setpump==2)     % case 2
 elseif (setpump==3)     % case 3
     dngbar_max = sqrt(1/max(loss1(:,end)));
     dngbar = dngbar_max*0.99;
-    P = (dngbar_max^2*loss1(:,end))*ones(1,length(x));
+    P = (dngbar_max^2*loss1(:,end)).*ones(1,length(x));
     P = P - dngbar^2*loss1;
     dng_full = real(dng1.*dngbar./sqrt(P));
 else
@@ -295,7 +297,7 @@ xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
 ylabel(cb1, '{\Delta}n_g')
 %% For pump in y+ direction. (pump 2)
 % The pump case set will be same as the pump 1 for preventing confusion.
-loss2 = cumsum(dng2.^2 .* al2,1) * (y(2)-y(1));
+loss2 = cumsum(dng2.^2 .* al2, 1) * (y(2)-y(1));
 
 if (setpump==1)         % case 1
     dngbar_max = sqrt(1/max(loss2(end,:)));
@@ -305,14 +307,14 @@ if (setpump==1)         % case 1
     dng_full = real(dng2.*dngbar./sqrt(P));
 elseif (setpump==2)     % case 2
     dngbar_max = sqrt(1/max(loss2(end,:)));
-    dngbar = dngbar_max*sqrt(0.5);
+    dngbar = dngbar_max*sqrt(0.1);
     P = 1 + 0*yy;
     P = P - dngbar^2*loss2;
     dng_full = real(dng2.*dngbar./sqrt(P));
 elseif (setpump==3)     % case 3
     dngbar_max = sqrt(1/max(loss2(end,:)));
     dngbar = dngbar_max*0.99;
-    P = (dngbar_max^2*loss2(:,end))*ones(1,length(x));
+    P = (dngbar_max^2*loss2(end,:)).*ones(length(y),1);
     P = P - dngbar^2*loss2;
     dng_full = real(dng2.*dngbar./sqrt(P));
 else

@@ -10,11 +10,11 @@ lam = 780e-9; 1.55e-6;          % wavelength
 c = 3e8;
 k0 = 2*pi./lam;
 
-neff = 1.5;             % effective index of fundamental mode
+neff = 1.4635;             % effective index of fundamental mode
 beta = neff*k0;         % propagation constant of mode
-w0 = 2e-6;              % waist of fundamental mode
-sigma = 2e-6;           % waist of refractive index profile
-dng = 5e-3;             % grating index contrast
+w0 = 3e-6;              % waist of fundamental mode
+sigma = 3e-6;           % waist of refractive index profile
+dng = 3e-3;             % grating index contrast
 
 % theta = 30 * pi/180;    % tilt angle of grating
 % Lambda =  0.8165*lam/neff;  % grating periodicity
@@ -23,8 +23,11 @@ dng = 5e-3;             % grating index contrast
 % use function to calculate the correct grating angles and period for specific target direction
 
 tarv = [1 1 1];     % direction of target (x,y,z)=(forward,vertical,transverse)
-[Lambda0,al_grat,theta] = grating_angles_3D_f(tarv)
+[Lambda0,al_grat,theta] = grating_angles_3D_f(tarv);
 Lambda = Lambda0*lam/neff;
+
+fprintf('theta_tilt = %2.2f \n', theta*180/pi);
+fprintf('theta_inc  = %2.2f \n', al_grat*180/pi);
 
 w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 
@@ -32,7 +35,6 @@ w = 1/sqrt(1/w0^2+1/sigma^2);   % effective width of mode and grating
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%% pump at an angle inside slab %%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 kz = beta*(-0.3:0.01:0.3);     % transverse k
 kx = sqrt(beta^2-kz.^2);        % longitudinal k
 al_prop = asin(kz/beta);       % propagation angle
@@ -46,18 +48,17 @@ ngratx = -cos(theta)*cos(al_grat);
 ngraty = sin(theta);  
 ngratz = -cos(theta)*sin(al_grat);   
 
-npropx = cos(al_prop);  npropy = 0*npropx;    npropz = sin(al_prop);
+npropx = cos(al_prop);  npropy = 0*npropx;   npropz = sin(al_prop);
     
 al_inc = acos(-ngratx.*npropx);
 
 figure(12)
-plot(al_prop*180/pi,al_inc*180/pi)
-xlabel('propagation angle')
-ylabel('incident angle rel. grating plane')
+plot(al_prop*180/pi, al_inc*180/pi, 'linewidth', 2);
+xlabel('input prop angle rel. to x-axis [deg]')
+ylabel('incident angle rel. grating slice, \theta_{inc} [deg]')
 
 
 % define polarisation vectors of s and p, for input (pump) and output (Bragg scattered beam):
-
 % define incident plane, i.e. its normal vector (normal to propagation and normal of grating)
 % ninc = ngrat x nprop
 
@@ -90,12 +91,12 @@ nscatx = npropx - 2*ngratx.*qprojection;
 nscaty = npropy - 2*ngraty.*qprojection;
 nscatz = npropz - 2*ngratz.*qprojection;
 
-figure(30)
-plot(al_prop*180/pi,nscatx,al_prop*180/pi,nscaty,al_prop*180/pi,nscatz)
-xlabel('propagation angle')
-ylabel('x,y,z projections')
-legend('x component','y component','z component')
-title('propagation direction of beam reflected by single grating plane')
+% figure(30)
+% plot(al_prop*180/pi,nscatx,al_prop*180/pi,nscaty,al_prop*180/pi,nscatz)
+% xlabel('propagation angle')
+% ylabel('x,y,z projections')
+% legend('x component','y component','z component')
+% title('propagation direction of beam reflected by single grating plane')
 
 
 % output s polarisation: same as input s polarisation
@@ -108,37 +109,36 @@ noutpx = noutsy.*nscatz - noutsz.*nscaty;
 noutpy = noutsz.*nscatx - noutsx.*nscatz;
 noutpz = noutsx.*nscaty - noutsy.*nscatx;
 
-figure(31)
-plot(al_prop*180/pi,ninpx,al_prop*180/pi,ninpy,al_prop*180/pi,ninpz)
-xlabel('propagation angle')
-ylabel('x,y,z projections')
-legend('x component','y component','z component')
-title('p-polarised input, x,y,z components')
-
-figure(32)
-plot(al_prop*180/pi,ninsx,al_prop*180/pi,ninsy,al_prop*180/pi,ninsz)
-xlabel('propagation angle')
-ylabel('x,y,z projections')
-legend('x component','y component','z component')
-title('s-polarised input, x,y,z components')
-
-figure(33)
-plot(al_prop*180/pi,noutpx,al_prop*180/pi,noutpy,al_prop*180/pi,noutpz)
-xlabel('propagation angle')
-ylabel('x,y,z projections')
-legend('x component','y component','z component')
-title('p-polarised output, x,y,z components')
-
-figure(34)
-plot(al_prop*180/pi,noutsx,al_prop*180/pi,noutsy,al_prop*180/pi,noutsz)
-xlabel('propagation angle')
-ylabel('x,y,z projections')
-legend('x component','y component','z component')
-title('s-polarised output, x,y,z components')
+% figure(31)
+% plot(al_prop*180/pi,ninpx,al_prop*180/pi,ninpy,al_prop*180/pi,ninpz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('x,y,z projections')
+% legend('x component','y component','z component')
+% title('p-polarised input')
+% 
+% figure(32)
+% plot(al_prop*180/pi,ninsx,al_prop*180/pi,ninsy,al_prop*180/pi,ninsz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('x,y,z projections')
+% legend('x component','y component','z component')
+% title('s-polarised input')
+% 
+% figure(33)
+% plot(al_prop*180/pi,noutpx,al_prop*180/pi,noutpy,al_prop*180/pi,noutpz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('x,y,z projections')
+% legend('x component','y component','z component')
+% title('p-polarised output')
+% 
+% figure(34)
+% plot(al_prop*180/pi,noutsx,al_prop*180/pi,noutsy,al_prop*180/pi,noutsz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('x,y,z projections')
+% legend('x component','y component','z component')
+% title('s-polarised output')
 
 
 % input vertical (y) polarisation
-
 %ne = [0, 1, 0];     % direction of polarisation
 nex = 0;
 ney = 1;
@@ -150,28 +150,40 @@ pys = nex.*ninsx + ney.*ninsy + nez.*ninsz;
 pyp = nex.*ninpx + ney.*ninpy + nez.*ninpz;
 
 % input horizontal (x-z) polarisation
-
 %ne = [-sin(al_prop), 0, cos(al_prop)];     % direction of polarisation, orthogonal to nprop
 nex = -sin(al_prop);
 ney = 0;
 nez = cos(al_prop);
 
-% project of polarisation ons and p
-
+% project of polarisation on s and p
 pxs = nex.*ninsx + ney.*ninsy + nez.*ninsz;
 pxp = nex.*ninpx + ney.*ninpy + nez.*ninpz;
 
-% figure(13)
-% plot(al_prop*180/pi,pxs,al_prop*180/pi,pxp,al_prop*180/pi,pys,al_prop*180/pi,pyp)
-% xlabel('propagation angle')
-% ylabel('power in s and p polarisation')
-% legend('z pol, s component','z pol, p component','y pol, s component','y pol, p component')
-
 figure(13)
-plot(al_prop*180/pi,pxs.^2,al_prop*180/pi,pys.^2)
-xlabel('propagation angle')
-ylabel('power in s polarisation')
-legend('z pol input','y pol input')
+plot( ...
+    al_prop*180/pi, pxs.^2, ...
+    al_prop*180/pi, pxp.^2, ...
+    al_prop*180/pi, pys.^2, '--', ...
+    al_prop*180/pi, pyp.^2, '--', 'linewidth', 2)
+xlabel('input prop angle rel. to x-axis [deg]');
+ylabel('normalised power in');
+legend( ...
+    'horizontal (s-pol)', 'horizontal (p-pol)', ...
+    'vertical (s-pol)', 'vertical (p-pol)')
+
+% figure(14)
+% plot(al_prop*180/pi,pxs.^2,al_prop*180/pi,pxp.^2, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('normalised power in');
+% legend('z-pol s-componet', 'p-pol');
+% title('power in horizontally polarised input (s)')
+
+% figure(15)
+% plot(al_prop*180/pi,pys.^2,al_prop*180/pi,pyp.^2, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('normalised power in');
+% legend('s-pol', 'p-pol');
+% title('power in vertically polarised input (p)')
 
 % output propagation direction and angle (from diffraction)
 
@@ -183,10 +195,10 @@ kdiffy = sqrt(beta^2-kdiffx.^2-kdiffz.^2);
 
 phivar3d = real(asin(kdiffy/beta));
 
-figure(14)
-plot(al_prop*180/pi,phivar3d*180/pi)
-xlabel('propagation angle')
-ylabel('diffracted beam output angle')
+% figure(15)
+% plot(al_prop*180/pi,phivar3d*180/pi)
+% xlabel('propagation angle')
+% ylabel('diffracted beam output angle')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,12 +215,25 @@ alphas3 = alphas3.*sin(phivar3d);
 
 alphap3 = alphas3 .* cos(2*al_inc).^2;
 
+% figure(26)
+% plot(...
+%     al_prop*180/pi, alphas3,...
+%     al_prop*180/pi, alphap3,...
+%     al_prop*180/pi, pxp.^2.*alphap3 + pxs.^2.*alphas3,...
+%     al_prop*180/pi, pyp.^2.*alphap3 + pys.^2.*alphas3)
+% xlabel('propagation angle')
+% ylabel('scattering rate')
+% legend('s pol','p pol','z pol, avg','y pol, avg')
+% title('includes change in kx, incident angle, scatter power direction')
+
 figure(26)
-plot(al_prop*180/pi,alphas3,al_prop*180/pi,alphap3,al_prop*180/pi,pxp.^2.*alphap3+pxs.^2.*alphas3,al_prop*180/pi,pyp.^2.*alphap3+pys.^2.*alphas3)
-xlabel('propagation angle')
+plot(...
+    al_prop*180/pi, alphas3,...
+    al_prop*180/pi, alphap3, 'linewidth', 2);
+xlabel('input prop angle rel. to x-axis [deg]')
 ylabel('scattering rate')
-legend('s pol','p pol','z pol, avg','y pol, avg')
-title('includes change in kx, incident angle, scatter power direction')
+legend('s-pol', 'p-pol')
+% title('includes change in kx, incident angle, scatter power direction')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -232,16 +257,30 @@ Exx = Es3.*pxs.*noutsx + Ep3.*pxp.*noutpx;
 Exy = Es3.*pxs.*noutsy + Ep3.*pxp.*noutpy;
 Exz = Es3.*pxs.*noutsz + Ep3.*pxp.*noutpz;
 
-figure(41)
-plot(al_prop*180/pi,Eyx,al_prop*180/pi,Eyy,al_prop*180/pi,Eyz)
-xlabel('propagation angle')
-ylabel('Output E-field in x,y,z')
-legend('x component','y component','z component')
-title('Output E-field for vertically polarised input')
+% figure(41)
+% plot(...
+%     al_prop*180/pi, Eyx, ...
+%     al_prop*180/pi, Eyy, ...
+%     al_prop*180/pi, Eyz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('Output E-field in x,y,z')
+% legend('x component','y component','z component')
+% title('Output E-field for vertically polarised input (p)')
 
-figure(42)
-plot(al_prop*180/pi,Exx,al_prop*180/pi,Exy,al_prop*180/pi,Exz)
-xlabel('propagation angle')
-ylabel('Output E-field in x,y,z')
-legend('x component','y component','z component')
-title('Output E-field for horizontally polarised input')
+% figure(42)
+% plot(...
+%     al_prop*180/pi, Exx, ...
+%     al_prop*180/pi, Exy, ...
+%     al_prop*180/pi, Exz, 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('Output E-field in x,y,z')
+% legend('x component','y component','z component')
+% title('Output E-field for horizontally polarised input (s)')
+
+figure(43)
+plot(...
+    al_prop*180/pi, sqrt(Exx.^2 + Exy.^2 + Exz.^2), ...
+    al_prop*180/pi, sqrt(Eyx.^2 + Eyy.^2 + Eyz.^2), '--', 'linewidth', 2)
+xlabel('input prop angle rel. to x-axis [deg]')
+ylabel('Electric field norm / [Vm^{-1}]')
+legend('horizontal (s)', 'vertical (p)')
