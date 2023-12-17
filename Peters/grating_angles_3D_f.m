@@ -1,6 +1,8 @@
 function [lamgrat,alphagrat,alphatilt] = grating_angles_3D_f(xtarv)
 % input: xtrav = [target_x,target_y,target_z]
-%        where x=pump propagation, z=transverse (in plane), y=vertical (out of plane)
+%        where  x=pump propagation, 
+%               z=transverse (in plane), 
+%               y=vertical (out of plane)
 % output: grating period (units of lambda in material), grating direction, tilt angle
 
 % based on grating_angles_3D_v1.m

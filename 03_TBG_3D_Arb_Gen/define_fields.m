@@ -39,7 +39,7 @@ else
 end
 
 % define the pump
-k1x = k1; w_y = 3e-6; w_z = 8e-6;
+k1x = k1; w_y = 3e-6; w_z = 10e-6;
 E_pump = exp(1i*k1x*xx).*exp(-yy.^2/w_z^2).*exp(-zz.^2/w_y^2);
 
 % define the target field
@@ -54,14 +54,13 @@ elseif strcmpi(type, 'gaussian') %NB: working in the rotated frame.
     w = 3e-6; %% ADJUST HERE %%
     % distance to target location
     zfoc = 50e-6; %% ADJUST HERE %%
-    
     % z in rotated frame = projection onto prop. direction
-    z = xx*n(1) + zz*n(2) + yy*n(3);
+    z = xx*n(1) + yy*n(2) + zz*n(3);
     % x=r in rotated frame = the orth. component to z
     r = sqrt(xx.^2 + zz.^2 + yy.^2 - z.^2);
     z = z - zfoc;
     
-    zR = pi*w^2/lam;
+    zR = w^2 * k1/2;
     wz = w*sqrt(1+(z/zR).^2);
     eta = atan(z/zR);
     % inverse of curvature

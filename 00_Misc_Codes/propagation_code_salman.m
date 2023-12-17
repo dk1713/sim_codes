@@ -137,8 +137,9 @@ Ek_pro  = exp(-1i*ky_air*y).*(Ek_tar*ones(size(y)));
 E_pro   = fftshift(  ifft( fftshift(Ek_pro,1) ),1  ) .* (exp(-1i*k_cen*x) * ones(size(y)));
 
 %%
-figure(4)
-pcolor(x*1e3, y*1e3, abs(E_pro)')
+figure(4); clf;
+openfig('/Users/dom/Downloads/Dataset/Figure5.21/Focused_zoomed_in.fig');
+contour(x*1e3, y*1e3, abs(E_pro)')
 xlabel('x / [mm]')
 ylabel('y / [mm]')
 shading flat

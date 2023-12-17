@@ -15,6 +15,7 @@ n_cl    = 1.4555;
 n_co    = 1.4608;
 dn      = 5e-3;
 dn_g    = 1.2e-3;
+w_0     = 2.2719;
 
 n_eff   = 1.4640; % This is from COMSOL simulation
 
@@ -73,6 +74,6 @@ xlabel('scattering direction, \phi / [deg]');
 ylabel('reflectance at 100 {\mu}m / [%]');
 
 %% save data
-save('in_plane_efficiencies.mat', 'phis', ...
-    'eff_fixed_lg_db', 'eff_fixed_lg_per', ...
-    'eff_fixed_w_db',  'eff_fixed_w_per')
+% save('in_plane_efficiencies.mat', 'phis', ...
+%     'eff_fixed_lg_db', 'eff_fixed_lg_per', ...
+%     'eff_fixed_w_db',  'eff_fixed_w_per')

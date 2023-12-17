@@ -44,7 +44,7 @@ y = (-.5*Ly: dy :.5*Ly);
 [xx, yy] = meshgrid(x, y);
 
 % direction vector for output beam
-n_out = [-1, -1, 1];
+n_out = [0, 0, 1];
 
 % Set the pump types with case 1, 2, 3:
 %   1. flat pump at input P=1, choose max dng for pump depletion
@@ -65,8 +65,8 @@ E1 = define_target_field(xx, yy, beta, n_out, 'gaussian', w0, dist_f);
     n_out(1), n_out(2), n_out(3), n_in);
 Lam_grat0_1 = Lam_grat0_1 * lam/n_eff;
 fprintf('grating period = %2.2e [m]\n', Lam_grat0_1);
-fprintf('angle of grating rotation = %2.1f [deg]\n', alp_grat0_1*180/pi);
-fprintf('tilt angle = %2.1f [deg]\n', alp_tilt0_1*180/pi);
+fprintf('angle of grating rotation, theta_rot = %2.1f [deg]\n', alp_grat0_1*180/pi);
+fprintf('tilt angle, theta_tilt = %2.1f [deg]\n', alp_tilt0_1*180/pi);
 
 % local propagation direction of target field, extracted from E-grid
 kx = -1i * apply_cen_1st_diff2(E1, dx, 1) ./ E1; kx = real(kx);
@@ -75,6 +75,14 @@ kz = sqrt(beta^2 - kx.^2 - ky.^2);
 
 [Lam_grat, alp_grat, alp_tilt] = compute_grating_angles(kx, ky, kz, n_in);
 Lam_grat = Lam_grat * lam/n_eff;
+% figure(111);clf;
+% contour(Lam_grat,100);
+% colorbar
+% axis equal
+
+% figure(112);clf;
+% contour(180*alp_tilt/pi,100);
+% colorbar
 
 % =1 horizontal input polarisation; =2 vertical input polarisation
 pol = 1;
@@ -223,7 +231,7 @@ if (setpump==1)         % case 1
     dng_full = real(dng1.*dngbar./sqrt(P));
 elseif (setpump==2)     % case 2
     dngbar_max = sqrt(1/max(loss1(:,end)));
-    dngbar = dngbar_max*sqrt(0.5);
+    dngbar = dngbar_max*sqrt(0.1);
     P = 1 + 0*xx;
     P = P - dngbar^2*loss1;
     dng_full = real(dng1.*dngbar./sqrt(P));
@@ -242,26 +250,30 @@ end
 figure(11); clf;
 ax1 = axes;
 pcolor(1e6*x, 1e6*y, P);
-xlabel(ax1, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
+xlabel(ax1, 'x/ {\mu}m', 'fontsize', 16);
+ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
 shading flat;
+axis equal;
 a = colorbar;
-ylabel(a,'Intensity/ [a.u.]');
+ylabel(a,'Intensity/ [a.u.]', 'fontsize', 16);
+set(gca, 'FontSize', 16);
 
 xxplot = xx; yyplot = yy; zzplot = 0*xx;
+% Lam_grat0 = 5.329689101469081e-07;
 
 % alpha_grat0
-phi = angle(E1.*exp(-1i*beta*(...
-    n_out(1)*xxplot...
-    + n_out(2)*yyplot...
+phi = angle(E1.*exp(-1i*beta/n_eff*(...
+    + n_out(1)*xxplot ...
+    + n_out(2)*yyplot ...
     + n_out(3)*zzplot)));
 
 % Compute refractive index distribution, ng, in new rotated frame (phi)
-ng  = dng_full.*sin(2*pi/Lam_grat0_1*(...
+ng  = dng_full.*sin(2*pi./Lam_grat0_1.*(...
     xxplot*cos(alp_grat0_1) + yyplot*sin(alp_grat0_1) ...
     - zzplot*tan(alp_tilt0_1)) - phi);
 
 % compute for ng for y=0 line (sideview)
-x_p = xx(1,:); z_p = (-3:0.01:3)*1e-6;
+x_p = xx(1,:); z_p = (-3:0.05:3)*1e-6;
 [xxplot,zzplot] = meshgrid(x_p,z_p); yyplot = 0*xxplot;
 
 % phase of target field at y=0
@@ -281,20 +293,75 @@ ng_temp = ng; ngp_temp = ngp;
 
 % Plot of the top and side view of the 2D planar grating design:
 figure(12); clf;
-ax1 = axes; pcolor(1e6*x, 1e6*y, ng); shading interp;
-ax2 = axes; pcolor(1e6*x_p, 1e6*z_p, ngp); shading interp;
+ax1 = axes; pcolor(1e6*x, 1e6*y, ng);
+shading interp;
+set(gca, 'FontSize', 16);
 
-ax1.XTick = [];
-% Define the size of the plot
-ax1_height = .7; ax2_height = .12;
-set(ax1, 'Position',[.13 .28 .685 ax1_height]);
-set(ax2, 'Position',[.13 .12 .685 ax2_height]);
+ax2  = axes; pcolor(1e6*x_p, 1e6*z_p, ngp);
+shading interp;
+ylim([-3 3]);
+set(gca, 'FontSize', 16);
 
-cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
+set(ax1, 'Position',[.21 .26 .50 ax1_height]);
+set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m'); 
-ylabel(cb1, '{\Delta}n_g')
+cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
+colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
+
+xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
+ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);
+
+
+% figure(102); clf;
+% pcolor(1e6*x, 1e6*y, ng); shading interp; axis equal;
+% 
+% figure(103); clf;
+% pcolor(1e6*x_p, 1e6*z_p, ngp); shading interp; axis equal;
+
+%% cross section
+% figure(40); clf;
+% plot(1e6*x, ng_temp(401,:))
+% 
+% figure(41); clf;
+% plot(1e6*x, ngp_temp(61,:))
+
+%% cross section overlap
+% must run the holo check first so that it has the dataset here.
+% ng = ng_temp(401,:);
+% ng = ng/max(ng);
+% 
+% hol1 = squeeze(E1_int(401, :));
+% hol1 = hol1/max(hol1);
+% 
+% figure(50); clf;
+% plot( ...
+%     1e6*x, ng, ...
+%     1e6*x, hol1, '-', ...
+%     'linewidth', 2);
+% xlabel('x/ {\mu}m', 'fontsize', 16);
+% ylabel('normalised {\Delta}n_g', 'fontsize', 16);
+% set(gca, 'FontSize', 16);
+% xlim([-10, 10]);
+% ylim([-1.1 1.1]);
+% 
+% ngp = ngp_temp(61,:);
+% ngp = ngp/max(ngp);
+% 
+% hol2 = squeeze(E2_int(61, :));
+% hol2 = hol2/max(hol2);
+% 
+% figure(51); clf;
+% plot( ...
+%     1e6*x, ngp, ...
+%     1e6*x, hol2, '-', ...
+%     'linewidth', 2);
+% xlabel('x/ {\mu}m', 'fontsize', 16);
+% ylabel('normalised {\Delta}n_g', 'fontsize', 16);
+% set(gca, 'FontSize', 16);
+% xlim([-10, 10]);
+% ylim([-1.1 1.1]);
 %% For pump in y+ direction. (pump 2)
 % The pump case set will be same as the pump 1 for preventing confusion.
 loss2 = cumsum(dng2.^2 .* al2, 1) * (y(2)-y(1));
@@ -334,18 +401,18 @@ ylabel(a,'Intensity/ [a.u.]');
 xxplot = xx; yyplot = yy; zzplot = 0*xx;
 
 % alpha_grat0
-phi = angle(E2.*exp(-1i*beta*(...
-    n_out(1)*xxplot ...
+phi = angle(E2.*exp(-1i*beta/n_eff*(...
+    + n_out(1)*xxplot ...
     + n_out(2)*yyplot ...
     + n_out(3)*zzplot)));
 
 % Compute refractive index distribution, ng, in new rotated frame (phi)
 ng = dng_full.*sin(2*pi/Lam_grat0_2*( ...
     xxplot*cos(alp_grat0_2) + yyplot*sin(alp_grat0_2)...
-    - zzplot*tan(alp_tilt0_2)) - phi);
+    - zzplot*tan(alp_tilt0_2)));
 
 % compute for ng for y=0 line (sideview)
-x_p = xx(1,:); z_p = (-3:0.01:3)*1e-6;
+x_p = xx(1,:); z_p = (-3:0.05:3)*1e-6;
 [xxplot,zzplot] = meshgrid(x_p,z_p); yyplot = 0*xxplot;
 
 % phase of target field at y=0
@@ -363,19 +430,23 @@ ngp = dng_fullp.*sin(2*pi/Lam_grat0_2*(...
 figure(22); clf;
 ax1 = axes; pcolor(1e6*x, 1e6*y, ng);
 shading interp;
+set(gca, 'FontSize', 16);
 
 ax2  = axes; pcolor(1e6*x_p, 1e6*z_p, ngp);
 shading interp;
+ylim([-3 3]);
+set(gca, 'FontSize', 16);
 
-ax1.XTick = []; ax1_height = .7; ax2_height = .12;
-set(ax1, 'Position',[.13 .28 .685 ax1_height]);
-set(ax2, 'Position',[.13 .12 .685 ax2_height]);
+ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
+set(ax1, 'Position',[.21 .26 .50 ax1_height]);
+set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 
-cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
+colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
-ylabel(cb1, '{\Delta}n_g');
+xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
+ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);
 
 %% Plot for superposed grating design
 ng_temp     = ng_temp + ng;
@@ -384,15 +455,20 @@ ngp_temp    = ngp_temp + ngp;
 figure(31); clf;
 ax1 = axes; pcolor(1e6*x, 1e6*y, ng_temp);
 shading interp;
+set(gca, 'FontSize', 16);
+
 ax2 = axes; pcolor(1e6*x_p, 1e6*z_p, ngp_temp);
 shading interp;
+ylim([-3 3]);
+set(gca, 'FontSize', 16);
 
-ax1.XTick = []; ax1_height = .7; ax2_height = .12;
-set(ax1, 'Position',[.13 .28 .685 ax1_height]);
-set(ax2, 'Position',[.13 .12 .685 ax2_height]);
+ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
+set(ax1, 'Position',[.21 .26 .50 ax1_height]);
+set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 
-cb1 = colorbar(ax1,'Position',[.83 .28 .04 ax1_height]);
-colorbar(ax2,'Position',[.83 .12 .04 ax2_height]);
+cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
+colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
-ylabel(cb1, '{\Delta}n_g')
+xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
+ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);

@@ -55,7 +55,6 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     ngratz = -cos(theta).*sin(al_grat);   
 
     npropx = cos(al_prop);  npropy = 0*npropx;  npropz = sin(al_prop);
-
     al_inc = acos(-ngratx.*npropx -ngraty.*npropy -npropz.*ngratz);
     % figure(112)
     % pcolor(180*al_prop/pi)    

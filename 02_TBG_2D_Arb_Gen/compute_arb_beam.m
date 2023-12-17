@@ -21,7 +21,7 @@ h_core  = 5e-6;
 % Parameters of the Gaussians
 % Positions of the Gaussian addressing [m]
 d       = 50e-6;
-r_xs    = 0e-6;
+r_xs    = 30e-6;
 % r_xs    = [-5e-6, 5e-6] + 0e-6;
 % r_xs    = [-20e-6, 20e-6];
 % r_xs    = [0, 30e-6];

@@ -22,7 +22,7 @@ dng = 3e-3;             % grating index contrast
 
 % use function to calculate the correct grating angles and period for specific target direction
 
-tarv = [1 1 1];     % direction of target (x,y,z)=(forward,vertical,transverse)
+tarv = [0 1 0];     % direction of target (x,y,z)=(forward,vertical,transverse)
 [Lambda0,al_grat,theta] = grating_angles_3D_f(tarv);
 Lambda = Lambda0*lam/neff;
 
@@ -49,13 +49,13 @@ ngraty = sin(theta);
 ngratz = -cos(theta)*sin(al_grat);   
 
 npropx = cos(al_prop);  npropy = 0*npropx;   npropz = sin(al_prop);
-    
-al_inc = acos(-ngratx.*npropx);
+al_inc = acos(-ngratx.*npropx-ngratz.*npropz);
 
 figure(12)
 plot(al_prop*180/pi, al_inc*180/pi, 'linewidth', 2);
-xlabel('input prop angle rel. to x-axis [deg]')
-ylabel('incident angle rel. grating slice, \theta_{inc} [deg]')
+xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
+ylabel('incident angle rel. grating slice, \theta_{inc} [deg]', 'fontsize', 16);
+set(gca, 'FontSize', 16);
 
 
 % define polarisation vectors of s and p, for input (pump) and output (Bragg scattered beam):
@@ -159,17 +159,18 @@ nez = cos(al_prop);
 pxs = nex.*ninsx + ney.*ninsy + nez.*ninsz;
 pxp = nex.*ninpx + ney.*ninpy + nez.*ninpz;
 
-figure(13)
+figure(13); clf;
 plot( ...
     al_prop*180/pi, pxs.^2, ...
     al_prop*180/pi, pxp.^2, ...
     al_prop*180/pi, pys.^2, '--', ...
     al_prop*180/pi, pyp.^2, '--', 'linewidth', 2)
-xlabel('input prop angle rel. to x-axis [deg]');
-ylabel('normalised power in');
+xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
+ylabel('normalised power in', 'fontsize', 16);
 legend( ...
     'horizontal (s-pol)', 'horizontal (p-pol)', ...
-    'vertical (s-pol)', 'vertical (p-pol)')
+    'vertical (s-pol)', 'vertical (p-pol)', 'fontsize', 14, 'location', 'best');
+set(gca, 'FontSize', 16);
 
 % figure(14)
 % plot(al_prop*180/pi,pxs.^2,al_prop*180/pi,pxp.^2, 'linewidth', 2)
@@ -215,12 +216,12 @@ alphas3 = alphas3.*sin(phivar3d);
 
 alphap3 = alphas3 .* cos(2*al_inc).^2;
 
-% figure(26)
+% figure(206)
 % plot(...
 %     al_prop*180/pi, alphas3,...
 %     al_prop*180/pi, alphap3,...
-%     al_prop*180/pi, pxp.^2.*alphap3 + pxs.^2.*alphas3,...
-%     al_prop*180/pi, pyp.^2.*alphap3 + pys.^2.*alphas3)
+%     al_prop*180/pi, pxp.^2.*alphap3 + pxs.^2.*alphas3, '--', ...
+%     al_prop*180/pi, pyp.^2.*alphap3 + pys.^2.*alphas3, '--')
 % xlabel('propagation angle')
 % ylabel('scattering rate')
 % legend('s pol','p pol','z pol, avg','y pol, avg')
@@ -230,11 +231,20 @@ figure(26)
 plot(...
     al_prop*180/pi, alphas3,...
     al_prop*180/pi, alphap3, 'linewidth', 2);
-xlabel('input prop angle rel. to x-axis [deg]')
-ylabel('scattering rate')
-legend('s-pol', 'p-pol')
+xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
+ylabel('scattering rate', 'fontsize', 16);
+legend('s-pol', 'p-pol', 'fontsize', 14, 'location', 'best');
+set(gca, 'FontSize', 16);
 % title('includes change in kx, incident angle, scatter power direction')
 
+figure(27)
+plot(...
+    al_prop*180/pi, pxp.^2.*alphap3 + pxs.^2.*alphas3,...
+    al_prop*180/pi, pyp.^2.*alphap3 + pys.^2.*alphas3, 'linewidth', 2);
+xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
+ylabel('scattering rate', 'fontsize', 16);
+legend('horizontally', 'vertically', 'fontsize', 14, 'location', 'best');
+set(gca, 'FontSize', 16);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% scattered electric field %%%
@@ -277,10 +287,10 @@ Exz = Es3.*pxs.*noutsz + Ep3.*pxp.*noutpz;
 % legend('x component','y component','z component')
 % title('Output E-field for horizontally polarised input (s)')
 
-figure(43)
-plot(...
-    al_prop*180/pi, sqrt(Exx.^2 + Exy.^2 + Exz.^2), ...
-    al_prop*180/pi, sqrt(Eyx.^2 + Eyy.^2 + Eyz.^2), '--', 'linewidth', 2)
-xlabel('input prop angle rel. to x-axis [deg]')
-ylabel('Electric field norm / [Vm^{-1}]')
-legend('horizontal (s)', 'vertical (p)')
+% figure(43)
+% plot(...
+%     al_prop*180/pi, sqrt(Exx.^2 + Exy.^2 + Exz.^2), ...
+%     al_prop*180/pi, sqrt(Eyx.^2 + Eyy.^2 + Eyz.^2), '--', 'linewidth', 2)
+% xlabel('input prop angle rel. to x-axis [deg]')
+% ylabel('Electric field norm / [Vm^{-1}]')
+% legend('horizontal (s)', 'vertical (p)')

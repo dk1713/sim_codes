@@ -13,8 +13,8 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % Target distance and beam waist [um]
-% r       = 30;
-r       = [-30, 30];
+r       = 30;
+% r       = [-30, 30];
 % r       = [20, 30] + 10;
 d       = 50;
 w_0     = 3;
@@ -235,13 +235,21 @@ yline(ax1, d + h,        '--r', 'LineWidth', 2, 'HandleVisibility','off')
 
 %% plot of the close-up of the grating feature
 figure(17); clf;
-pcolor(x0, y0, abs(Ez_wg));
+pcolor(x0, y0, abs(Ez_wg)/1000);
 shading interp
 % colormap(ax2, 'jet')
 ylim([-5, 5]);
-xlim([-15, 15]);
-xlabel('x/ {\mu}m')
-ylabel('y/ {\mu}m');
+xlim([-30, -10]);
+xlabel('x/ {\mu}m', 'fontsize', 16);
+ylabel('y/ {\mu}m', 'fontsize', 16);
 cb1 = colorbar;
-ylabel(cb1, '|E|/ kVm^{-1}')
+ylabel(cb1, '|E|/ kVm^{-1}', 'fontsize', 16)
 axis equal
+set(gca, 'FontSize', 16);
+
+%% plot of the close-up of the grating feature
+figure(18); clf;
+plot(x0, abs(Ez_wg(:,1000)/1000), 'linewidth', 2)
+xlabel('x/ {\mu}m', 'fontsize', 16);
+ylabel('|E|/ kVm^{-1}', 'fontsize', 16);
+set(gca, 'FontSize', 16);

@@ -41,7 +41,7 @@ function varargout = compute_grating_angles(varargin)
     varargout{1} = 2*pi./sqrt(k_gratx.^2 + k_graty.^2);
     % grating direction (angle), alp_grat
     varargout{2} = atan2(k_graty, k_gratx);
-%     varargout{2} = atan(k_graty./k_gratx); issue is that this only covers
+%     varargout{2} = atan(k_graty./k_gratx); %issue is that this only covers
 %     -pi/2 to pi/2 
 
     % normal to the grating planes

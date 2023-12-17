@@ -21,7 +21,6 @@ function E = define_target_field(varargin)
     
     % target field amplitude - THIS SHOULD NOT HAVE ANY EFFECT
     E_0 = 0.1;      
-
     if strcmp(type, 'plane')   
         n_vec   = n_vec/norm(n_vec);
         k_x     = k*n_vec(1);
@@ -33,7 +32,7 @@ function E = define_target_field(varargin)
         n_vec = n_vec/norm(n_vec);
 
         % z in rotated frame = projection onto prop. direction
-        zzr = xx*n_vec(1) + yy*n_vec(2);
+        zzr = xx*n_vec(1) + yy*n_vec(2);% + zz*n_vec(3);
         % x=r in rotated frame = the orth. component to z
         xxr = sqrt(xx.^2+yy.^2 - zzr.^2);
         zzr = zzr - zfoc;
@@ -43,7 +42,7 @@ function E = define_target_field(varargin)
         eta = atan(zzr/z_R);
         % inverse of curvature, 1/R_z
         Rz_inv = zzr./(zzr.^2 + z_R^2);
-
+        
         E = E_0 * w0./w_z .* exp(-(xxr./w_z).^2) ...
             .* exp(1i*(k*zzr+k*xxr.^2.*Rz_inv/2-eta));
     else

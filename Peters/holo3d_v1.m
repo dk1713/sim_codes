@@ -63,7 +63,7 @@ end
 
 if (0==0)   % tilted Gaussian
     % al2 = 60 *pi/180;   % propagation angle, 90deg=vertical
-    n = [1 0 1];   % direction of propagation
+    n = [0 0 1];   % direction of propagation
     n = n/norm(n);
 
     w2 = 2.5e-6;
