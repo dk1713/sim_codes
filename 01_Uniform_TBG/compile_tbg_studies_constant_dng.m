@@ -11,6 +11,7 @@ dn_g    = 1.2e-3;
 lam     = 780*1e-3;
 Lam     = lam/(n_cl * cos(phi) + n_eff);
 K       = 2 * pi./Lam;
+w_0     = 2.2719;
 
 %% 1 dn_g efficiency studies
 dn_gss  = linspace(0, 5, 100)*1e-3;
@@ -40,11 +41,21 @@ alpha_ana   = alpha_ana * exp(-.5*w_th_sqd .* (2*beta*cos(theta)^2 - K).^2);
 % ylabel('reflectance at 100 {\mu}m / [%]')
 % legend('analytical', 'numerical' )
 
-% 3mm
+%% 2mm
 figure(13)
-plot(   dn_gss, 100*(1 - 10.^(-alpha_ana*(3e-3)*1e6/log(10))), 'linewidth', 2)
+plot(dn_gss, 100*(1 - 10.^(-alpha_ana*(3e-3)*1e6/log(10))), 'linewidth', 2);
 xlabel('Index modulation, {\Delta}n_g')
 ylabel('Reflectance at 3mm grating[%]')
+xlim([.2e-3, .8e-3])
+yline(4, '--r', 'linewidth', 2);
+xline(4.81e-4, '--r', 'linewidth', 2);
+set(gca, 'FontSize', 14);
+
+%% fig 3.5 in dB
+data_x = dn_gss;
+% data_y = 10*alpha_ana*(3e-3)*1e6/log(10);
+data_y = 100*(1 - 10.^(-alpha_ana*(3e-3)*1e6/log(10)));
+save('figure.mat', 'data_x', 'data_y');
 
 %% fig 3.5 in dB
 data_x = dn_gss;

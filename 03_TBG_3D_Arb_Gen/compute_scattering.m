@@ -24,7 +24,7 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     end
     
     Lambda  = varargin{1}; % grating period.
-    al_grat = varargin{2}; % frame is rotated by this angle.
+    theta_r = varargin{2}; % frame is rotated by this angle.
     theta   = varargin{3}; % tilt angle, angle of the slices to the y-axis
     w0      = varargin{4}; % waveguide width
     sigma   = varargin{5}; % input mode width
@@ -45,14 +45,14 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     al_prop = asin(kz/beta);       % propagation angle
 
 
-    % incident angle relative to grating planes
-    % ngrat = [-cos(theta), sin(theta), 0];     
-    % normal to grating plane (x,y,z), then rotate in (x,z) plane by al_grat
-    % nprop = [cos(al_prop), 0, sin(al_prop)];  % prop. direction
-
-    ngratx = -cos(theta).*cos(al_grat);   
+    % incident angle relative to grating planes  
+    % normal to grating plane (x,y,z), then rotate in (x,z) plane by
+    % theta_r (rotation)
+    
+    % prop. direction
+    ngratx = -cos(theta).*cos(theta_r);   
     ngraty = sin(theta);  
-    ngratz = -cos(theta).*sin(al_grat);   
+    ngratz = -cos(theta).*sin(theta_r);   
 
     npropx = cos(al_prop);  npropy = 0*npropx;  npropz = sin(al_prop);
     al_inc = acos(-ngratx.*npropx -ngraty.*npropy -npropz.*ngratz);
@@ -203,8 +203,8 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     % output propagation direction and angle (from diffraction)
     Kgrat = 2*pi./Lambda;   % grating "propagation" constant
 
-    kdiffx = kx - Kgrat.*cos(al_grat);      % diffracted beam
-    kdiffz = kz - Kgrat.*sin(al_grat);
+    kdiffx = kx - Kgrat.*cos(theta_r);      % diffracted beam
+    kdiffz = kz - Kgrat.*sin(theta_r);
     kdiffy = sqrt(beta^2-kdiffx.^2-kdiffz.^2);
 
     phivar3d = real(asin(kdiffy/beta));
@@ -220,7 +220,7 @@ function [al, Ex, Ey, Ez] = compute_scattering(varargin)
     %%% scattering coefficients %%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % project pump propgation constant onto grating direction (in x,z plane)
-    kpumpnormal = kx.*cos(al_grat) + kz.*sin(al_grat);
+    kpumpnormal = kx.*cos(theta_r) + kz.*sin(theta_r);
     
     alphas3 = sqrt(2*pi)./w0 ./ (2*cos(al_inc).^2).^2 ...
         .*(pi./Lambda).^2 .*(w./sin(2*theta)).^2 .*(dng./neff).^2 ...

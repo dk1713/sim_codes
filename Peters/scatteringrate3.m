@@ -145,7 +145,6 @@ ney = 1;
 nez = 0;
 
 % project of polarisation on s and p
-
 pys = nex.*ninsx + ney.*ninsy + nez.*ninsz;
 pyp = nex.*ninpx + ney.*ninpy + nez.*ninpz;
 

@@ -50,5 +50,5 @@ function varargout = compute_grating_angles(varargin)
 
     % grating tilt angle w.r.t. vertical, alp_tilt
     %   NB: (=0 vertical, =90 deg horizontal planes)
-    varargout{3} = pi/2 - acos(n_gratz);
+    varargout{3} = asin(n_gratz);
 end
