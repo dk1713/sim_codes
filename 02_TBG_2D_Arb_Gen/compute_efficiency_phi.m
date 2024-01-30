@@ -151,14 +151,14 @@ xlabel('scattering angle, \phi / [deg]')
 ylabel('reflectance efficiencies [%]')
 
 %
-if n == 1
-    type = 'gauss';
-else
-    type = 'super';
-end
-
-save(   ['efficiency_' type '.mat'], ...
-        'x',  's');
+% if n == 1
+%     type = 'gauss';
+% else
+%     type = 'super';
+% end
+% 
+% save(   ['efficiency_' type '.mat'], ...
+%         'x',  's');
 %%
 % s3 = real(s3);
 % save(   ['efficiency_' type '.mat'], ...

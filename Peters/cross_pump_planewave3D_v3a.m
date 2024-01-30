@@ -15,7 +15,7 @@ global lam c k0 neff beta w0 sigma dng
 lam = 780e-9;           % wavelength
 k0 = 2*pi/lam;
 
-polout = 1;     % set output polarisation: 1=lin pol 1, 2=lin pol 2, 3=circ pol 1, 4=circ pol 2
+polout = 3;     % set output polarisation: 1=lin pol 1, 2=lin pol 2, 3=circ pol 1, 4=circ pol 2
 
 
 c = 3e8;
@@ -296,6 +296,11 @@ xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
 subplot(236)
 contour(xx,yy,al1cross.*dng2.^2+al2cross.*dng1.^2), shading flat, colorbar
 xlabel('x/ {\mu}m'); ylabel('y/ {\mu}m');
+
+%%
+A = (al1cross.*dng2.^2+al2cross.*dng1.^2 > 1e-4);
+area = sum(sum(A))/(size(A,1)*size(A,2));
+disp(area*100);
 
 %% for poster
 % figure(6)

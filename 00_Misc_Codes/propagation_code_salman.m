@@ -46,9 +46,6 @@ y_rot   = (x - x_focus)*sin(phi) + (0 - y_focus)*cos(phi);
 % Waist on the surface of the glass
 w       = .1e-3;
 
-% % beam waist
-% w_0     = sqrt(.5*(w^2 + sqrt(w^4 - 4*(dist*lam/pi/n_air)^2)));
-
 % Rayleigh range(1)
 temp_b  = pi*n_air*w^2/lam;
 y_R     = .5*( temp_b - sqrt(temp_b^2 - 4*y_focus^2) );
@@ -138,13 +135,13 @@ E_pro   = fftshift(  ifft( fftshift(Ek_pro,1) ),1  ) .* (exp(-1i*k_cen*x) * ones
 
 %%
 figure(4); clf;
-openfig('/Users/dom/Downloads/Dataset/Figure5.21/Focused_zoomed_in.fig');
-contour(x*1e3, y*1e3, abs(E_pro)')
+pcolor(x*1e3, y*1e3, abs(E_pro)')
 xlabel('x / [mm]')
 ylabel('y / [mm]')
 shading flat
 colorbar
 xlim([-.15 .15])
+set(gca, 'FontSize', 16);
 
 e_norm = abs(E_pro)';
-save('prop_data.mat', 'x', 'y', 'e_norm');
+save('data/prop_data.mat', 'x', 'y', 'e_norm');

@@ -61,21 +61,22 @@ end
 
 %% Figures
 figure(1); clf;
-plot(sigmas, n_effs, 'x-');
-yline(n_eff);
+plot(sigmas, n_effs, 'x-', 'LineWidth', 2);
 xlabel('sigma, {\sigma} / [um]');
 ylabel('effective index, n_{eff}');
+set(gca, 'FontSize', 16);
 
 figure(2); clf;
-plot(sigmas, w_0s, 'x-');
-yline(w_0);
+plot(sigmas, w_0s, 'x-', 'LineWidth', 2);
 xlabel('sigma, {\sigma} / [um]');
 ylabel('waveguide width, w_0 / [um]');
+set(gca, 'FontSize', 16);
 
 figure(3); clf;
-plot(sigmas, errors, 'x-')
+plot(sigmas, errors, 'x-', 'LineWidth', 2);
 xlabel('sigma, {\sigma} / [um]');
 ylabel('relative squred error');
+set(gca, 'FontSize', 16);
 
 figure(4); clf;
 plot(...
@@ -84,7 +85,7 @@ plot(...
     sigs_ana(3, :), refl_sig_ana(3, :), '--', ...
     sigs_num(1, :), refl_sig_num(1, :), 'x', ...
     sigs_num(2, :), refl_sig_num(2, :), '+', ...
-    sigs_num(3, :), refl_sig_num(3, :), 'o')
+    sigs_num(3, :), refl_sig_num(3, :), 'o', 'LineWidth', 2);
 xlabel('sigma, {\sigma} / [um]');
 ylabel('Reflectance / [%]');
 colororder(["#8040E6";"#1AA640";"#E68000"])
@@ -96,17 +97,19 @@ legend(...
 % figure 5: o(sig^2 w0 / (w0^2 + sig^2) )
 % figure 6: o(1/n_eff^2)
 
-% ord_w0 = sigmas.^2.*w_0s./(sigmas.^2 + w_0s.^2);
-% figure(5); clf;
-% plot(sigmas, ord_w0, 'x-')
-% xlabel('sigma, {\sigma} / [um]');
-% ylabel('o(\sigma^2 w_0/(\sigma^2 + w_0^2) / [1/um]');
-% 
-% ord_n_eff = 1./n_effs.^2;
-% figure(6); clf;
-% plot(sigmas, ord_n_eff, 'x-')
-% xlabel('sigma, {\sigma} / [um]');
-% ylabel('o(1/n_{eff}^2)');
+ord_w0 = sigmas.^2.*w_0s./(sigmas.^2 + w_0s.^2);
+figure(5); clf;
+plot(sigmas, ord_w0, 'x-', 'LineWidth', 2);
+xlabel('sigma, {\sigma} / [um]');
+ylabel('o(\sigma^2 w_0/(\sigma^2 + w_0^2) / [1/um]');
+set(gca, 'FontSize', 16);
+
+ord_n_eff = 1./n_effs.^2;
+figure(6); clf;
+plot(sigmas, ord_n_eff, 'x-', 'LineWidth', 2);
+xlabel('sigma, {\sigma} / [um]');
+ylabel('o(1/n_{eff}^2)');
+set(gca, 'FontSize', 16);
 
 %% write .mat
 % save('dataset_3ab.mat', ...

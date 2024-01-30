@@ -94,6 +94,14 @@ ky = 0*Lam_grat;
 fprintf('scattering rate = %2.4e\n', norm(al1));
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+
+%% efficiency
+
+efficiency    = 100 - 100*exp(-trapz(x, al1));
+fprintf('power efficiency    = %2.4e [dB] \n', trapz(x, 10*alpha_ana/log(10)));
+fprintf('power scattered out = %2.1f [%%] \n', 100 - 100*10^(-.1*trapz(x, 10*alpha_ana/log(10))));
+fprintf('power scattered out = %2.1f [%%] \n', efficiency);
+
 %% pump in y (pump 2)
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
 disp('calculating grating profile with pump in y')

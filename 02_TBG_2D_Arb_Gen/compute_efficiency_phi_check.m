@@ -20,7 +20,7 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % distance from the top of the glass.
-dist    = 5e-3;
+dist    = 1e-3;
 
 %% Specification for environments
 % Wavenumbers
@@ -30,12 +30,12 @@ k0_core = 2*pi*n_core   /   lam;
 
 %% Focussed beam feature
 % Define grid points
-L_x     = 10e-3;
+L_x     = 20e-3;
 
-phi     = 30*pi/180;
+phi     = 0*pi/180;
 x_tar   = [dist*tan(phi), -dist];
-waist   = 10e-6;
-n = 10;
+waist   = 2e-3;
+n = 1;
 
 gaussian = @(x, phi, x_tar, w, n) ...
         exp(-1i * k0 * (  sin(phi)*x  )) .* exp(-( (x-x_tar(1))/w ).^( 2*n ));
@@ -46,7 +46,7 @@ x      = linspace(-.5*L_x, .5*L_x, 2^14)';
 E_tar  = gaussian(x, phi, x_tar(1), waist, n);
 %%
 % checking the shape
-figure(10)
+figure(12); clf;
 plot(x*1e3, abs(E_tar))
 xline(x_tar(1)*1e3, '--r')
 xlabel('x / [mm]')
@@ -95,7 +95,7 @@ Ek_grat = exp(-1i*ky_core*-h_core/2).*Ek_grat;
 E_grat_shifted  = fftshift(  ifft( fftshift(Ek_grat) )  );
 E_grat  = E_grat_shifted .* exp(-1i*k_cen*x);
 
-figure(11)
+figure(13); clf;
 plot(x*1e3, abs(E_grat))
 xline(0, '--r');
 xlabel('x / [mm]')

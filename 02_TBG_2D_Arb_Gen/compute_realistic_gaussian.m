@@ -20,10 +20,11 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % distance from the top of the glass.
-dist    = 50e-3;
+dist    = 5e-3;
 
 % grating length
-len_g   = 10e-3;
+% len_g   = 10e-3;
+len_g   = .3e-3;
 
 %% Specification for environments
 % Wavenumbers
@@ -33,14 +34,14 @@ k0_core = 2*pi*n_core   /   lam;
 
 %% Focussed beam feature
 % Define grid points
-L_x     = 30e-3;   
+L_x     = .5e-3;   
 Nx      = 2^14; 
 dx      = L_x / Nx;
 x       = (-Nx/2:Nx/2-1)' * dx;
 y_focus = dist;
 
 % rotated frame
-phi     = 10*pi/180;
+phi     = 0*pi/180;
 x_focus = dist*tan(phi);
 x_rot   = (x - x_focus)*cos(phi) - (0 - y_focus)*sin(phi);
 y_rot   = (x - x_focus)*sin(phi) + (0 - y_focus)*cos(phi);
@@ -158,7 +159,7 @@ xline(0, '--r');
 yline(0, '--r');
 xline(1e3*x_focus, '--k');
 yline(1e3*y_focus, '--k');
-axis equal
+% axis equal
 
 %% Required grating profile calculation
 phase   = (unwrap(angle(E_grat_shifted)));
@@ -239,13 +240,14 @@ plot(1e3*x, 1e9*period)
 yline(1e9*lam/(1*cos(phi+.5*pi) + n_eff), '--k', 'constant k');
 xlabel('x / [mm]')
 ylabel('grating period / [nm]')
-% xlim([-1.2 1.2])
+xlim([-.1 .1])
 title('desired grating period')
 
 figure(6)
 plot(1e3*x, dn_gs);
 xlabel('x / [mm]')
 ylabel('grating strength')
+xlim([-.1 .1])
 % xlim([-1.2 1.2])
 title('desired grating strength')
 
