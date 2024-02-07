@@ -9,8 +9,8 @@ model = mphload('tbg_constant_dng.mph');
 % input mode is affected by the sigma and also looking into the
 % efficiencies when scattering upwards at 90 degs.
 
-%% Taking up parameter data from .mph
-% for labelling
+%% Start script
+% Taking up init parameters from .mph for labelling .mat
 L       = mphglobal(model, 'L');
 H       = mphglobal(model, 'H');
 L_g     = mphglobal(model, 'L_g');
@@ -19,17 +19,20 @@ n_cl    = mphglobal(model, 'n_cl');
 n_co    = mphglobal(model, 'n_co');
 sigma   = mphglobal(model, 'sigma');
 dn      = mphglobal(model, 'dn');
-% Note that the dimensions are in um so careful with the unit.
+% **Note that the dimensions are in um so careful with the unit.**
 
 %% init
 dn_g    = 3e-3;
 lam     = 780;
 phi_deg = 120;
-% Default values:
+
+% setting up default values in the .mph file. Not necessary if .mph files
+% are saved with parameters.
 model.param('par3').set( 'dn_g',    num2str(dn_g) );
 model.param('par2').set( 'lambda0', [num2str(lam), ' [nm]']);
 model.param('par2').set( 'phi',     [num2str(phi_deg), ' [deg]'] );
 
+% For labelling .m filed at the end
 model_spec = [                      ...
     '_L_',      num2str(L),         ...
     '_H_',      num2str(H),         ...
@@ -43,19 +46,25 @@ model_spec = [                      ...
     ];
 
 %% Input Mode
+% Running plain channel waveguide FEM simulations that minimises back
+% reflection affecting the input mode. The effect from the back reflection
+% is very small in holographically written waveguide cases.
 disp('v---------------------Computation started---------------------v');
 disp('Computing for width of the input mode');
 % setting no dng s.t. there is no back reflection. 
 model.param('par3').set( 'dn_g',   num2str(0) );
-model.study('std1').run
+model.study('std1').run % run
+% saving effective index from FEM
 n_eff   = mphglobal(model, 'real(ewfd.neff_1)');
 
+% defining the grid points to set coordinates in which to extract
+% information from.
 y       = linspace(-.5*H, .5*H, 2^9);
 x       = -.5*L;
 xx      = [x*ones(size(y)); y];
 normE0  = mphinterp(model, 'ewfd.normE', 'coord', xx);
 
-% function handles
+% function handles for the Gaussian fit
 gauss       =   @(x, a, b, c)...
     a*exp(-((x-b)/c).^2);
 fit_gauss   =   @(p, x, data)...
@@ -77,14 +86,12 @@ xlabel('x [{\mu}m]');
 ylabel('y [V / m]');
 legend('numerical', 'fitting' );
 
+% calculating the relative squared error
 error0 = sum((gauss(y,par0(1),par0(2),par0(3))-normE0).^2) ...
     /sum((normE0 - mean(normE0)).^2);
 fprintf('Relative squared error = %2.4e \n', error0);
 
-disp('^--------------------Computation completed--------------------^');
-
 %% Parametric sweep for sigma
-disp('v---------------------Computation started---------------------v');
 fprintf('Computing for n_eff and w_0 for varying sigma\n');
 
 % reset to default
@@ -99,10 +106,6 @@ power_out_sig   = ones(size(sigmas));
 errors          = ones(size(sigmas));
 normEs          = ones(length(sigmas), length(y));
 fittings        = ones(length(sigmas), length(y));
-% errors          = ones(1,2);
-% normEs          = ones(2,length(y));
-% fittings        = ones(2,length(y));
-% err_ite         = 0;
 
 for iter = 1:num_of_ite
     fprintf('Computing for sigma = %4.1f [um]', sigmas(iter));
@@ -145,23 +148,6 @@ for iter = 1:num_of_ite
     fittings(iter,:)= gauss(y, par(1), par(2), par(3));
     errors(iter)    = error;
     
-%     if iter == 1 || iter == num_of_ite - 2
-%         fprintf('collecting RSE for sigma = %2.2f [um] \n', sigmas(iter));
-%         figure(iter); clf;
-%         plot(y, normE, '-', y, gauss(y, par(1), par(2), par(3)), '--');
-%         xlabel('x [{\mu}m]');
-%         ylabel('y [V / m]');
-%         legend('numerical', 'fitting' );
-%         error = sum((gauss(y,par(1),par(2),par(3))-normE).^2) ...
-%             /sum((normE - mean(normE)).^2);
-%         fprintf('Relative squared error = %2.4e \n', error);
-%         err_ite = err_ite + 1;
-%         
-%         % collecting dataset
-%         normEs(err_ite,:)   = normE;
-%         fittings(err_ite,:) = gauss(y, par(1), par(2), par(3));
-%         errors(err_ite)     = error;
-%     end
 end
 
 disp('^--------------------Computation completed--------------------^');

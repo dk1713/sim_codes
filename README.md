@@ -8,7 +8,29 @@ NB:
  - For more detail descriptions, the comments are written inside.
 
 ## 01 Uniform tilted Bragg gratings
+### COMSOL FEM data generation scripts
+generate_input_mode.m 					- generates Gaussian fitting comparison on the input mode (uses RSE)
+generate_tbg.m 						- generates three sets of efficiency calculation varying dn_g, lambda and theta
+generate_tbg_directions.m 				- generates efficiency calculations for varying scattering directions.
+
+### Compiling saved data and figure generation
+compile_input_mode.m
+compile_input_mode.m
+compile_input_mode.m
+compile_input_mode.m
+compile_input_mode.m
+compile_input_mode.m
+
+### Functions
+
+### Compiling data scripts
 
 ## 02 2D Arbitrary beam generation with TBG
+### Functions
+
+### Compiling data scripts
 
 ## 03 3D Arbitrary beam generation with TBG
+### Functions
+
+### Compiling data scripts

@@ -1,6 +1,13 @@
 function [half_max, x_at_hm, fwhm] = find_fwhm(x_arg, y_arg)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%find_fwhm: Finding the full width at half maximum (FWHM) for a given
+%Gaussian curve. 
+%   Input:
+%   x_arg       (1xm float) av ector of x
+%   y_arg       (1xm float) a vector of y
+%   Output:
+%   half_max    (float) The half maximum value.
+%   x_at_hm     (1x2 flott) x positions where half maximum occur.
+%   fwhm        (float) full width at half maximum.
 half_max    = .5*max(y_arg);
 
 iter        = 1;
