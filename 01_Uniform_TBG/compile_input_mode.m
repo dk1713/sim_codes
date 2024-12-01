@@ -69,7 +69,7 @@ set(gca, 'FontSize', 16);
 figure(2); clf;
 plot(sigmas, w_0s, 'x-', 'LineWidth', 2);
 xlabel('sigma, {\sigma} / [um]');
-ylabel('waveguide width, w_0 / [um]');
+ylabel('mode width, w_0 / [um]');
 set(gca, 'FontSize', 16);
 
 figure(3); clf;
@@ -85,9 +85,9 @@ plot(...
     sigs_ana(3, :), refl_sig_ana(3, :), '--', ...
     sigs_num(1, :), refl_sig_num(1, :), 'x', ...
     sigs_num(2, :), refl_sig_num(2, :), '+', ...
-    sigs_num(3, :), refl_sig_num(3, :), 'o', 'LineWidth', 2);
+    sigs_num(3, :), refl_sig_num(3, :), 'o', 'LineWidth', 2, 'markerSize', 15);
 xlabel('sigma, {\sigma} / [um]');
-ylabel('Reflectance / [%]');
+ylabel('Diffraction efficiency / [%]');
 colororder(["#8040E6";"#1AA640";"#E68000"])
 legend(...
     '60^\circ', '90^\circ', '120^\circ', ...

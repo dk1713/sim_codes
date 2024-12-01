@@ -69,10 +69,31 @@ plot(   dn_gss, 10*alpha_ana*(1e-3)*1e6/log(10), 'b')
 xlabel('\Delta n_g')
 ylabel('outcoupling efficiency [dB]')
 
+%% % /10mm
+figure(30);
+plot(   dn_gss, 100*(1 - 10.^(-alpha_ana*(10e-3)*1e6/log(10))), ...
+    'LineWidth', 2, 'markerSize', 15);
+xlabel('index modulation, \Delta n_g')
+ylabel('diffraction efficiency at 10mm /[%]')
+
+%% % /3mm
+figure(40);
+plot(   dn_gss, 100*(1 - 10.^(-alpha_ana*(3e-3)*1e6/log(10))), ...
+    'LineWidth', 2, 'markerSize', 15);
+xlabel('index modulation, \Delta n_g')
+ylabel('diffraction efficiency at 3mm /[%]')
+
+%% %/10mm for fixed length
+figure(31); %dng= 1e-3;
+g_dist = linspace(0,20e-3,100);
+plot(   g_dist*1e3, 100*(1 - 10.^(-alpha_ana(21)*(g_dist)*1e6/log(10))), ...
+    'LineWidth', 2, 'markerSize', 15);
+xlabel('grating length/ [mm]')
+ylabel('diffraction efficiency at {\Delta}n_g = 1 \times 10^{-3}/[%]')
 %% lambdas efficiency studies 
-lambdass = linspace(650, 900, 2001)*1e-3;
-xlabel('grating index modulation, {\Delta}n_g')
-ylabel('reflectance at 10 mm / [%]')
+% lambdass = linspace(650, 900, 2001)*1e-3;
+% xlabel('grating index modulation, {\Delta}n_g')
+% ylabel('reflectance at 10 mm / [%]')
 
 %% 2 lambdas efficiency studies 
 % lambdass = linspace(650, 900, 2^10)*1e-3;

@@ -13,7 +13,7 @@ h_core  = 5e-6;
 lam     = 780e-9;
 
 % Target distance and beam waist [um]
-r       = 30;
+r       = 0;
 % r       = [-30, 30];
 % r       = [20, 30] + 10;
 d       = 50;
@@ -147,11 +147,11 @@ Ez_pro  = fftshift(  ifft( fftshift(Ek_pro,1) ),1  );
 figure(13); clf; colororder(["#8040E6";"#1AA640";"#E68000"]);
 plot(   x2*1e6,     abs(Ez_tar/max(Ez_tar)),     ...
         x_ori*1e6,  abs(Ez_ori/max(Ez_ori)),    '--',  ...
-        x*1e6,      abs(Ez/max(Ez)),            '-.', 'linewidth', 1)
+        x*1e6,      abs(Ez/max(Ez)),            '-.', 'linewidth', 2)
 xlabel('x/ {\mu}m')
 ylabel('Normalised |E|')
 ylim([0 1.1])
-xlim([-60 60])
+xlim([-30 30])
 legend('Simulated', 'Desired Shape', 'Above Grating', 'Location', 'northwest')
 
 %% plot of index distribution

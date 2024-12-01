@@ -22,7 +22,7 @@ dng = 3e-3;             % grating index contrast
 
 % use function to calculate the correct grating angles and period for specific target direction
 
-tarv = [0 1 0];     % direction of target (x,y,z)=(forward,vertical,transverse)
+tarv = [1 1 1];     % direction of target (x,y,z)=(forward,vertical,transverse)
 [Lambda0,al_grat,theta] = grating_angles_3D_f(tarv);
 Lambda = Lambda0*lam/neff;
 
@@ -231,9 +231,9 @@ plot(...
     al_prop*180/pi, alphas3,...
     al_prop*180/pi, alphap3, 'linewidth', 2);
 xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
-ylabel('scattering rate', 'fontsize', 16);
+ylabel('reflectance', 'fontsize', 16);
 legend('s-pol', 'p-pol', 'fontsize', 14, 'location', 'best');
-set(gca, 'FontSize', 16);
+set(gca, 'FontSize', 18);
 % title('includes change in kx, incident angle, scatter power direction')
 
 figure(27)
@@ -241,9 +241,9 @@ plot(...
     al_prop*180/pi, pxp.^2.*alphap3 + pxs.^2.*alphas3,...
     al_prop*180/pi, pyp.^2.*alphap3 + pys.^2.*alphas3, 'linewidth', 2);
 xlabel('input prop angle rel. to x-axis [deg]', 'fontsize', 16);
-ylabel('scattering rate', 'fontsize', 16);
+ylabel('reflectance', 'fontsize', 16);
 legend('horizontally', 'vertically', 'fontsize', 14, 'location', 'best');
-set(gca, 'FontSize', 16);
+set(gca, 'FontSize', 18);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% scattered electric field %%%

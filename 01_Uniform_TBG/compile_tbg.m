@@ -10,7 +10,7 @@ dn      = 5e-3;
 lam     = 780*1e-3;
 
 % Changing for dataset depends on dng
-dn_g    = 1e-3;
+dn_g    = 3e-3;
 
 % size
 grid_size = 2^11;
@@ -59,7 +59,7 @@ for iter = 1:length(phis_deg)
     theta   = .5*acos(lam/n_eff/Lam - 1);
 
     % 1 dn_g efficiency studies
-    dn_gss  = linspace(0, 5, grid_size)*1e-3;
+    dn_gss  = linspace(0, 6, grid_size)*1e-3;
     kappa   = dn_gss/n_eff;
     beta    = 2 * pi * n_eff/lam;
 
@@ -117,9 +117,9 @@ plot( ...
     dngs_ana(2,:), refl_dng_ana(2,:), 'r--', ... 
     dngs_num(1,:), refl_dng_num(1,:), 'kx', ...
     dngs_num(2,:), refl_dng_num(2,:), 'rs', ... 
-    dngs_num(3,:), refl_dng_num(3,:), 'bo')
+    dngs_num(3,:), refl_dng_num(3,:), 'bo', 'LineWidth', 2, 'markerSize', 15);
 xlabel('Index modulation, {\Delta}n_g')
-ylabel('Reflectance / [%]')
+ylabel('Diffraction efficiency / [%]')
 legend('60^\circ, 120^\circ', '90^\circ', ...
     '60^\circ', '90^\circ', '120^\circ', 'location', 'northwest')
 
@@ -130,9 +130,9 @@ plot( ...
     lams_ana(3,:), refl_lam_ana(3,:), 'b-.', ...
     lams_num(1,:), refl_lam_num(1,:), 'kx', ...
     lams_num(2,:), refl_lam_num(2,:), 'rs', ... 
-    lams_num(3,:), refl_lam_num(3,:), 'bo')
+    lams_num(3,:), refl_lam_num(3,:), 'bo', 'LineWidth', 2, 'markerSize', 15);
 xlabel('Input wavelength, \lambda / [nm]')
-ylabel('Reflectance / [%]')
+ylabel('Diffraction efficiency / [%]')
 legend('60^\circ', '90^\circ', '120^\circ', ...
     '60^\circ', '90^\circ', '120^\circ' )
 
@@ -143,9 +143,9 @@ plot( ...
     thes_ana(3,:), refl_the_ana(3,:), 'b-.', ... 
     thes_num(1,:), refl_the_num(1,:), 'kx', ...
     thes_num(2,:), refl_the_num(2,:), 'rs', ...
-    thes_num(3,:), refl_the_num(3,:), 'bo')
+    thes_num(3,:), refl_the_num(3,:), 'bo', 'LineWidth', 2, 'markerSize', 15);
 xlabel('Tilt angle, \theta / [deg]')
-ylabel('Reflectance / [%]')
+ylabel('Diffraction efficiency / [%]')
 legend('60^\circ', '90^\circ', '120^\circ', ...
     '60^\circ', '90^\circ', '120^\circ' )
 

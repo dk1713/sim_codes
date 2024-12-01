@@ -26,18 +26,18 @@ n_eff   = 1.4635;
 % propagation constant of mode
 beta    = k0*n_eff;
 % waist of output beam
-w0      = 3e-6;
+w0      = .3e-4;
 % waist of refractive index profile (vertical)
-sig     = 3e-6;
+sig     = .3e-4;
 % focal distance surface to waist
-dist_f  = 50e-6;
+dist_f  = 2e-4;
 % grating index contrast
 dn_g    = 1;    
 
 %% Define target beam (scalar), propagate to grating plane
 % grid in grating plane: horizontal cross section at z=0
-Lx = 40e-6;     dx = 0.05e-6;
-Ly = 40e-6;     dy = 0.05e-6;
+Lx = .1e-3;     dx = 0.05e-6;
+Ly = .1e-3;     dy = 0.05e-6;
 x = (-.5*Lx: dx :.5*Lx);
 y = (-.5*Ly: dy :.5*Ly);
 
@@ -94,13 +94,6 @@ ky = 0*Lam_grat;
 fprintf('scattering rate = %2.4e\n', norm(al1));
 E1norm = sqrt(Ex1.^2 + Ey1.^2 + Ez1.^2);
 disp('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-
-%% efficiency
-
-efficiency    = 100 - 100*exp(-trapz(x, al1));
-fprintf('power efficiency    = %2.4e [dB] \n', trapz(x, 10*alpha_ana/log(10)));
-fprintf('power scattered out = %2.1f [%%] \n', 100 - 100*10^(-.1*trapz(x, 10*alpha_ana/log(10))));
-fprintf('power scattered out = %2.1f [%%] \n', efficiency);
 
 %% pump in y (pump 2)
 disp('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
@@ -257,9 +250,9 @@ end
 %% plots for grating profile and pump in x
 figure(11); clf;
 ax1 = axes;
-pcolor(1e6*x, 1e6*y, P);
-xlabel(ax1, 'x/ {\mu}m', 'fontsize', 16);
-ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+pcolor(1e3*x, 1e3*y, P);
+xlabel(ax1, 'x/ mm', 'fontsize', 16);
+ylabel(ax1, 'y/ mm', 'fontsize', 16);
 shading flat;
 axis equal;
 a = colorbar;
@@ -301,13 +294,12 @@ ng_temp = ng; ngp_temp = ngp;
 
 % Plot of the top and side view of the 2D planar grating design:
 figure(12); clf;
-ax1 = axes; pcolor(1e6*x, 1e6*y, ng);
+ax1 = axes; pcolor(1e3*x, 1e6*y, ng);
 shading interp;
 set(gca, 'FontSize', 16);
 
-ax2  = axes; pcolor(1e6*x_p, 1e6*z_p, ngp);
+ax2  = axes; pcolor(1e3*x_p, 1e6*z_p, ngp);
 shading interp;
-ylim([-3 3]);
 set(gca, 'FontSize', 16);
 
 ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
@@ -317,8 +309,8 @@ set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
 colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
-ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+xlabel(ax2, 'x/ mm', 'fontsize', 16);
+ylabel(ax1, 'y/ mm', 'fontsize', 16);
 ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);
 
 
@@ -400,11 +392,13 @@ end
 %% plots for grating profile and pump in y
 figure(21); clf;
 ax1 = axes;
-pcolor(1e6*x, 1e6*y, P);
-xlabel(ax1, 'x/ {\mu}m'); ylabel(ax1, 'y/ {\mu}m');
+pcolor(1e3*x, 1e3*y, P);
+xlabel(ax1, 'x/ mm', 'fontsize', 16);
+ylabel(ax1, 'y/ mm', 'fontsize', 16);
 shading flat;
 a = colorbar;
-ylabel(a,'Intensity/ [a.u.]');
+ylabel(a,'Intensity/ [a.u.]', 'fontsize', 16);
+set(gca, 'FontSize', 16);
     
 xxplot = xx; yyplot = yy; zzplot = 0*xx;
 
@@ -436,13 +430,12 @@ ngp = dng_fullp.*sin(2*pi/Lam_grat0_2*(...
     - zzplot*tan(alp_tilt0_2)) - phip).*exp(-(zzplot/sig).^2);
 
 figure(22); clf;
-ax1 = axes; pcolor(1e6*x, 1e6*y, ng);
+ax1 = axes; pcolor(1e3*x, 1e6*y, ng);
 shading interp;
 set(gca, 'FontSize', 16);
 
-ax2  = axes; pcolor(1e6*x_p, 1e6*z_p, ngp);
+ax2  = axes; pcolor(1e3*x_p, 1e6*z_p, ngp);
 shading interp;
-ylim([-3 3]);
 set(gca, 'FontSize', 16);
 
 ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
@@ -452,8 +445,8 @@ set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
 colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
-ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+xlabel(ax2, 'x/ mm', 'fontsize', 16);
+ylabel(ax1, 'y/ mm', 'fontsize', 16);
 ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);
 
 %% Plot for superposed grating design
@@ -461,13 +454,12 @@ ng_temp     = ng_temp + ng;
 ngp_temp    = ngp_temp + ngp;
 
 figure(31); clf;
-ax1 = axes; pcolor(1e6*x, 1e6*y, ng_temp);
+ax1 = axes; pcolor(1e3*x, 1e6*y, ng_temp);
 shading interp;
 set(gca, 'FontSize', 16);
 
-ax2 = axes; pcolor(1e6*x_p, 1e6*z_p, ngp_temp);
+ax2 = axes; pcolor(1e3*x_p, 1e6*z_p, ngp_temp);
 shading interp;
-ylim([-3 3]);
 set(gca, 'FontSize', 16);
 
 ax1.XTick = []; ax1_height = .68; ax2_height = 6*ax1_height/40;
@@ -477,6 +469,6 @@ set(ax2, 'Position',[.21 .13 .50 ax2_height]);
 cb1 = colorbar(ax1,'Position',[.75 .26 .04 ax1_height]);
 colorbar(ax2,'Position',[.75 .13 .04 ax2_height]);
 
-xlabel(ax2, 'x/ {\mu}m', 'fontsize', 16);
-ylabel(ax1, 'y/ {\mu}m', 'fontsize', 16);
+xlabel(ax2, 'x/ mm', 'fontsize', 16);
+ylabel(ax1, 'y/ mm', 'fontsize', 16);
 ylabel(cb1, '{\Delta}n_g', 'fontsize', 16);
